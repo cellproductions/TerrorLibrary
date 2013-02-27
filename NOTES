@@ -1,0 +1,28 @@
+TODO:
+* Container needs all mouse input controls added
+* Label needs all mouse input controls added
+* LabelExtended needs all mouse input controls added
+* Slider needs all mouse input controls added
+* update Slider so that it uses the 'changed' variable
+
+* all input first needs to check if the control is enabled (direct input, meaning mouse click or key press)
+* set change variables where appropriate
+
+* Cursor needs to have a setPointerPosition(int x, int y) that sets, on its image, a spot where it gets its x and y positions from
+
+* GUI needs enabled variable
+* upon being de-enabled, GUIControls should draw grey, transparent filter over their graphics
+* every GUIControl needs alpha variable (upon being changed, set changed to true and set all appropriate Images to that alpha)
+* split every GUIControl's checks to draw the graphic (check alpha first, then check visibility)
+
+* add Exception classes
+* make numItems in any GUIControl private and give it a getter function
+
+* ListBox's need to fix the length of text if it goes outside the width of the list box
+* Click anywhere on a closed ListBoxDrop to open it
+* text box's should allow typing sentences outside of the box area, also left + right buttons should move a 'positioner' of sorts to let you type anywhere
+
+BUGS:
+* sliders dont set the slider at the right position from the constructor
+* clicking on an Item in a ListBox gets gradually more offset for some reason
+* ListBox numDown is 1 off when using scrollDown/Up compared to normal click scrolling (perhaps make click scroll use scrollDown/Up functions)
