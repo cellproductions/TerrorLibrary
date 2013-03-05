@@ -12,7 +12,7 @@ public class Slider extends GUIControl
 {
 	private int max;
 	private int min;
-	private int value;
+	private long value;
 	private Image box;
 	private Image slide;
 	private boolean pressing; // whether or not the user is holding down the mouse button while moving the slider
@@ -219,7 +219,7 @@ public class Slider extends GUIControl
 		}
 	}
 	
-	public int getValue()
+	public long getValue()
 	{
 		return value;
 	}
