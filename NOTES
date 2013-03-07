@@ -1,26 +1,54 @@
 TODO:
+
+Container:
 * Container needs all mouse input controls added
+
+
+Label:
 * Label needs all mouse input controls added
+* Labels could do auto line wrapping
+* Labels could also centre the text
+
+
+LabelExtended:
 * LabelExtended needs all mouse input controls added
+
+
+Slider:
 * Slider needs all mouse input controls added
 * update Slider so that it uses the 'changed' variable
 
+
+ListBox:
+* ListBox's need to fix the length of text if it goes outside the width of the list box
+
+
+ListBoxDrop:
+* Click anywhere on a closed ListBoxDrop to open it
+
+
+TextBox:
+* text box's should allow typing sentences outside of the box area, also left + right buttons should move a 'positioner' of sorts to let you type anywhere
+
+
+GUIControls:
 * all input first needs to check if the control is enabled (direct input, meaning mouse click or key press)
 * set change variables where appropriate
-
-* Cursor needs to have a setPointerPosition(int x, int y) that sets, on its image, a spot where it gets its x and y positions from
-
-* GUI needs enabled variable
 * upon being de-enabled, GUIControls should draw grey, transparent filter over their graphics
 * every GUIControl needs alpha variable (upon being changed, set changed to true and set all appropriate Images to that alpha)
 * split every GUIControl's checks to draw the graphic (check alpha first, then check visibility)
-
-* add Exception classes
 * make numItems in any GUIControl private and give it a getter function
+* instead of using new Color(), create pre made colors in GUIManager
+* add constant for font height to be used in all GUIControls
 
-* ListBox's need to fix the length of text if it goes outside the width of the list box
-* Click anywhere on a closed ListBoxDrop to open it
-* text box's should allow typing sentences outside of the box area, also left + right buttons should move a 'positioner' of sorts to let you type anywhere
+
+GUI:
+* GUI needs enabled variable
+* add Exception classes
+
+
+* Cursor needs to have a setPointerPosition(int x, int y) that sets, on its image, a spot where it gets its x and y positions from
+
 
 BUGS:
 * sliders dont set the slider at the right position from the constructor
