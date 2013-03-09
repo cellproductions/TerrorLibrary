@@ -197,6 +197,15 @@ public class GUI implements GUIInterface
 	{
 		x = i;
 		y = j;
+		GUIControl control;
+		for (Control itr : controls)
+		{
+			control = itr.guiControl;
+			float xx = control.x;
+			float yy = control.y;
+			control.gx = x + xx;
+			control.gy = y + yy;
+		}
 	}
 
 	public boolean getVisibility()
