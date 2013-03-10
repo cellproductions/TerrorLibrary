@@ -20,6 +20,10 @@ public class Container extends GUIControl
 	private int iHeight;
 	private int gap;
 	private boolean scaled;
+	public int selected;
+	private int oldIndex;
+	
+	GUISelectionFunction selectionChange;
 	
 	public Container()
 	{
@@ -34,6 +38,8 @@ public class Container extends GUIControl
 		gap = 0;
 		scaled = false;
 		items = new ArrayList<Item>();
+		selected = -1;
+		oldIndex = selected;
 	}
 	
 	public Container(int x, int y, int w, int h, Color col) throws SlickException
@@ -51,6 +57,8 @@ public class Container extends GUIControl
 		iHeight = 30;
 		gap = 20;
 		scaled = false;
+		selected = -1;
+		oldIndex = selected;
 		changed = true;
 	}
 	
@@ -68,6 +76,8 @@ public class Container extends GUIControl
 		iHeight = ih;
 		scaled = true;
 		this.gap = gap;
+		selected = -1;
+		oldIndex = selected;
 		changed = true;
 	}
 	
@@ -78,7 +88,8 @@ public class Container extends GUIControl
 		canvas.setColor(new Color(0, 0, 0));
 		canvas.drawRect(0, 0, width - 1, height - 1);
 		
-		toobig = iHeight * numItems + gap > height ? true : false;
+		toobig = (iHeight + gap) * numItems + gap > height ? true : false; // + gap for starting gap
+		/*
 		double w = width;
 		double iw = iWidth;
 		double g = gap;
@@ -96,6 +107,32 @@ public class Container extends GUIControl
 						canvas.drawImage(items.get(n).iGraphic, gap + j * iWidth, i * (iHeight + gap) + gap);
 				}
 				j++;
+			}
+		}
+		*/
+		// this wont draw items after scrolling down (cant use for-each loop)
+		int fitWidth = (int)Math.round(width / (iWidth + gap)); // how many items can fit horizontally
+		int vert = 0;
+		int numhor = 0;
+		Image todraw;
+		for (Item i : items)
+		{
+			if (numDown + vert < numItems)
+			{
+				todraw = scaled ? i.iGraphic.getScaledCopy(iWidth, iHeight) : i.iGraphic;
+				if (vert + numhor == selected)
+				{
+					Graphics g = todraw.getGraphics();
+					g.setColor(Color.yellow);
+					g.drawRect(0, 0, iWidth - 1, iHeight - 1);
+				}
+				canvas.drawImage(todraw, (gap * (numhor + 1)) + numhor * iWidth, (gap * (vert + 1)) + vert * iHeight);
+				numhor++;
+				if (numhor >= fitWidth)
+				{
+					numhor = 0;
+					vert++;
+				}
 			}
 		}
 		
@@ -120,8 +157,6 @@ public class Container extends GUIControl
 	
 	public void update(Graphics g)
 	{
-		graphic.setAlpha(owningGUI.graphic.getAlpha());
-		
 		if (mouseButtonDown(0))
 		{
 			float y = Cursor.getY() - gy;
@@ -156,6 +191,24 @@ public class Container extends GUIControl
 			*/
 		}
 		
+		if (mouseIsOver())
+		{
+			if (mouseOver != null)
+			{
+				mouseOver.execute(this);
+				changed = true;
+			}
+		}
+		
+		if (hasChanged() > -1)
+		{
+			if (selectionChange != null)
+				selectionChange.execute(selected, this);
+			changed = true;
+		}
+		if (selected < 0 || selected >= numItems)
+			selected = oldIndex = -1;
+		
 		try
 		{
 			if (changed)
@@ -171,6 +224,73 @@ public class Container extends GUIControl
 		
 		if (visible && graphic.getAlpha() > 0.00F)
 			g.drawImage(graphic, gx, gy);
+	}
+	
+	public void onMouseClick(GUIClickedFunction function)
+	{
+		mouseClick = function;
+	}
+	
+	public void onMouseOver(GUIMouseOverFunction function)
+	{
+		mouseOver = function;
+	}
+	
+	public void onSelectionChange(GUISelectionFunction function)
+	{
+		selectionChange = function;
+	}
+	
+	public void mousePressed(int button, int x, int y)
+	{
+		if (enabled)
+		{
+			if (!mouseIsOver())
+				return;
+			if (button == 0)
+			{
+				/*
+				if (isMouseWithinScroll())
+				{
+					if (toobig)
+					{
+						if (y - gy < height / 2 && y - gy >= 0 && numDown - 1 >= 0)
+						{
+							numDown--;
+							changed = true;
+						}
+						if (y - gy >= height / 2 && y - gy < height && numDown < numItems - visibleItems())
+						{
+							numDown++;
+							changed = true;
+						}
+					}
+				}
+				else
+				{
+				*/
+				int where = getIndexFromCoordinates(x - gx, y - gy);
+				if (where > -1)
+				{
+					oldIndex = selected;
+					selected = where;
+					changed = true;
+				}
+			}
+			
+			if (mouseClick != null) // mouseIsOver() is already checked at the top
+			{
+				mouseClick.execute(button, x, y, this);
+				changed = true;
+			}
+		}
+	}
+	
+	protected int hasChanged()
+	{
+		if (oldIndex != selected)
+			return (oldIndex = selected);
+		return -1;
 	}
 	
 	private class Item
@@ -220,6 +340,15 @@ public class Container extends GUIControl
 	public Image getGraphic(int pos)
 	{
 		return items.get(pos).iGraphic;
+	}
+	
+	public int getIndexFromCoordinates(float x, float y)
+	{
+		int column = (int)(x / (gap + iWidth));
+		int row = (int)(y / (gap + iHeight));
+		if (row + column < 0 || row + column >= numItems)
+			return -1;
+		return row + column;
 	}
 	
 	public void clear()

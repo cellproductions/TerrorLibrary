@@ -58,7 +58,12 @@ public class Label extends GUIControl
 		canvas.setColor(new Color(0, 0, 0));
 		Iterator<String> itr = list.iterator();
 		for (int i = 0; itr.hasNext(); i++)
-			canvas.drawString(itr.next(), 0, i * 24); //Config.font.getHeight(list.get(i)));// h / 2 - (Config.font.getHeight(t) / 2)); 
+			canvas.drawString(itr.next(), 0, i * 24); //Config.font.getHeight(list.get(i)));// h / 2 - (Config.font.getHeight(t) / 2));
+		if (GUIManager.debug)
+		{
+			canvas.setColor(Color.yellow);
+			canvas.drawRect(0, 0, width - 1, height - 1);
+		}
 	}
 
 	public void update(Graphics g)

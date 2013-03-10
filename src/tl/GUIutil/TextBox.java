@@ -113,6 +113,8 @@ public class TextBox extends GUIControl
 			}
 		}
 		
+		if (oldText == null) System.out.println("old");
+		if (text == null) System.out.println("text");
 		if (!oldText.contentEquals(text))
 		{
 			oldText = text;

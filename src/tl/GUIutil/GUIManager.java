@@ -11,6 +11,7 @@ public class GUIManager
 	public static int screenWidth;
 	public static int numGUIs = 0;
 	public static Input guiInput;
+	public static boolean debug = false;
 
 	public static void init(Input input, int width, int height, TrueTypeFont font)
 	{

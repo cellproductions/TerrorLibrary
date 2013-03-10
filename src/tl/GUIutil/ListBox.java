@@ -186,33 +186,30 @@ public class ListBox extends GUIControl
 				return;
 			if (button == 0)
 			{
-				if (enabled && visible)
+				if (isMouseWithinScroll())
 				{
-					if (isMouseWithinScroll())
+					if (toobig)
 					{
-						if (toobig)
+						if (y - gy < height / 2 && y - gy >= 0 && numDown - 1 >= 0)
 						{
-							if (y - gy < height / 2 && y - gy >= 0 && numDown - 1 >= 0)
-							{
-								numDown--;
-								changed = true;
-							}
-							if (y - gy >= height / 2 && y - gy < height && numDown < numItems - visibleItems())
-							{
-								numDown++;
-								changed = true;
-							}
-						}
-					}
-					else
-					{
-						int where = getIndexFromCoordinates(x, y - gy);
-						if (where > -1)
-						{
-							oldIndex = selected;
-							selected = where;
+							numDown--;
 							changed = true;
 						}
+						if (y - gy >= height / 2 && y - gy < height && numDown < numItems - visibleItems())
+						{
+							numDown++;
+							changed = true;
+						}
+					}
+				}
+				else
+				{
+					int where = getIndexFromCoordinates(x, y - gy);
+					if (where > -1)
+					{
+						oldIndex = selected;
+						selected = where;
+						changed = true;
 					}
 				}
 			}

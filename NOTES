@@ -7,7 +7,8 @@ Container:
 Label:
 * Label needs all mouse input controls added
 * Labels could do auto line wrapping
-* Labels could also centre the text
+* Labels could also centre the text (centreText function)
+* should draw text starting from x=0, y=0
 
 
 LabelExtended:
@@ -40,6 +41,7 @@ GUIControls:
 * make numItems in any GUIControl private and give it a getter function
 * instead of using new Color(), create pre made colors in GUIManager
 * add constant for font height to be used in all GUIControls
+* make owningGUI protected
 
 
 GUI:
@@ -48,6 +50,7 @@ GUI:
 
 
 * Cursor needs to have a setPointerPosition(int x, int y) that sets, on its image, a spot where it gets its x and y positions from
+* implement debugging for all GUI/GUIControls (draws a yellow rectangle around them, 0, 0, width - 1, height - 1)
 
 
 BUGS:
