@@ -10,7 +10,7 @@ import org.newdawn.slick.geom.Polygon;
 
 import tl.Util.Cursor;
 
-public class Container extends GUIControl
+public class Container<T> extends GUIControl
 {
 	private ArrayList<Item> items;
 	private int numItems;
@@ -120,7 +120,7 @@ public class Container extends GUIControl
 			if (numDown + vert < numItems)
 			{
 				todraw = scaled ? i.iGraphic.getScaledCopy(iWidth, iHeight) : i.iGraphic;
-				if (vert + numhor == selected)
+				if ((vert * fitWidth) + numhor == selected)
 				{
 					Graphics g = todraw.getGraphics();
 					g.setColor(Color.yellow);
@@ -296,10 +296,12 @@ public class Container extends GUIControl
 	private class Item
 	{
 		public Image iGraphic;
+		public T object;
 		
-		public Item(Image i)
+		public Item(Image i, T object)
 		{
 			iGraphic = scaled ? i.getScaledCopy(iWidth, iHeight) : i;
+			this.object = object;
 		}
 	}
 	
@@ -308,23 +310,23 @@ public class Container extends GUIControl
 		return items.isEmpty();
 	}
 	
-	public void addItem(Image image)
+	public void addItem(Image image, T object)
 	{
-		items.add(new Item(image));
+		items.add(new Item(image, object));
 		numItems++;
 		changed = true;
 	}
 	
-	public void addItemAt(int pos, Image image)
+	public void addItemAt(int pos, Image image, T object)
 	{
-		items.add(pos, new Item(image));
+		items.add(pos, new Item(image, object));
 		numItems++;
 		changed = true;
 	}
 	
-	public void setItem(int pos, Image image)
+	public void setItem(int pos, Image image, T object)
 	{
-		items.set(pos, new Item(image));
+		items.set(pos, new Item(image, object));
 		changed = true;
 	}
 	
@@ -337,18 +339,34 @@ public class Container extends GUIControl
 		changed = true;
 	}
 	
+	public void removeItem(T object)
+	{
+		if (items.contains(object))
+			items.remove(object);
+		numItems--;
+		if (!toobig)
+			numDown = 0;
+		changed = true;
+	}
+	
 	public Image getGraphic(int pos)
 	{
 		return items.get(pos).iGraphic;
 	}
 	
+	public T getObject(int pos)
+	{
+		return items.get(pos).object;
+	}
+	
 	public int getIndexFromCoordinates(float x, float y)
 	{
+		int fitWidth = (int)Math.round(width / (iWidth + gap));
 		int column = (int)(x / (gap + iWidth));
 		int row = (int)(y / (gap + iHeight));
-		if (row + column < 0 || row + column >= numItems)
+		if ((row * fitWidth) + column < 0 || (row * fitWidth) + column >= numItems)
 			return -1;
-		return row + column;
+		return (row * fitWidth) + column;
 	}
 	
 	public void clear()
