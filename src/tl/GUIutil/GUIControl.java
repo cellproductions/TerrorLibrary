@@ -112,6 +112,16 @@ public class GUIControl implements GUIInterface
 	{
 		this.visible = visible;
 	}
+	
+	public void onMouseOver(GUIMouseOverFunction function)
+	{
+		mouseOver = function;
+	}
+	
+	public void onMouseClick(GUIClickedFunction function)
+	{
+		mouseClick = function;
+	}
 
 	@Override
 	public void mousePressed(int button, int x, int y)

@@ -64,13 +64,14 @@ public class LabelExtended extends Label
 		
 		size = list.size();
 		
-		Graphics s = graphic.getGraphics();
-		s.clear();
-		s.setFont(GUIManager.guiFont);
-		s.setColor(new Color(0, 0, 0));
+		canvas = graphic.getGraphics();
+		canvas.clear();
+		canvas.setFont(GUIManager.guiFont);
+		canvas.setColor(new Color(0, 0, 0));
 		int size = list.size();
 		for (int i = 0; i < size; i++)
-			s.drawString(list.get(i), 0, i * 24);
+			canvas.drawString(list.get(i), 0, i * 24);
+		canvas.flush();
 	}
 	
 	public void update(Graphics g)

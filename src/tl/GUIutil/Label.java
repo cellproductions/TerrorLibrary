@@ -8,6 +8,18 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
+/**
+ * @author Callum
+ *
+ */
+/**
+ * @author Callum
+ *
+ */
+/**
+ * @author Callum
+ *
+ */
 public class Label extends GUIControl
 {
 	protected String text;
@@ -64,6 +76,7 @@ public class Label extends GUIControl
 			canvas.setColor(Color.yellow);
 			canvas.drawRect(0, 0, width - 1, height - 1);
 		}
+		canvas.flush();
 	}
 
 	public void update(Graphics g)
@@ -92,6 +105,25 @@ public class Label extends GUIControl
 		}
 		if (visible && graphic.getAlpha() > 0.00F)
 			g.drawImage(graphic, gx, gy);
+	}
+	
+	public void mousePressed(int button, int x, int y)
+	{
+		if (enabled)
+		{
+			if (!mouseIsOver())
+				return;
+			if (mouseClick != null)
+			{
+				mouseClick.execute(button, x, y, this);
+				changed = true;
+			}
+		}
+	}
+	
+	public void onMouseClick(GUIClickedFunction function)
+	{
+		mouseClick = function;
 	}
 	
 	public void onTextChange(GUITextFunction function)

@@ -10,8 +10,8 @@ import tl.Util.Cursor;
 
 public class Slider extends GUIControl
 {
-	private int max;
-	private int min;
+	private long max;
+	private long min;
 	private long value;
 	private Image box;
 	private Image slide;
@@ -44,35 +44,38 @@ public class Slider extends GUIControl
 		int xOffSet = 2;
 
 		box = new Image(w, h); // this goes here, only ever need to redraw the slide part
-		Graphics s = box.getGraphics();
-		s.setColor(new Color(0, 0, 0));
-		s.fill(new Rectangle(0, 0, w - 1, h));
-		s.setColor(new Color(70, 70, 70));
-		s.drawLine(0, 0, w - 1, 0);
-		s.drawLine(0, 0, 0, h - 1);
-		s.setColor(new Color(255, 255, 255));
-		s.drawLine(w - 1, 1, w - 1, h - 1);
-		s.drawLine(1, h - 1, w - 1, h - 1);
+		canvas = box.getGraphics();
+		canvas.setColor(new Color(0, 0, 0));
+		canvas.fill(new Rectangle(0, 0, w - 1, h));
+		canvas.setColor(new Color(70, 70, 70));
+		canvas.drawLine(0, 0, w - 1, 0);
+		canvas.drawLine(0, 0, 0, h - 1);
+		canvas.setColor(new Color(255, 255, 255));
+		canvas.drawLine(w - 1, 1, w - 1, h - 1);
+		canvas.drawLine(1, h - 1, w - 1, h - 1);
+		canvas.flush();
 		
 		w = 9;
 		h += 12;
 		slide = new Image(w, h);
-		s = slide.getGraphics();
-		s.setColor(new Color(160, 160, 160));
-		s.fill(new Rectangle(0, 0, w - 1, h - 1));
-		s.setColor(new Color(255, 255, 255));
-		s.drawLine(0, 0, w - 1, 0);
-		s.drawLine(0, 0, 0, h - 1);
-		s.setColor(new Color(70, 70, 70));
-		s.drawLine(w - 2, 1, w - 2, h - 1);
-		s.drawLine(1, h - 2, w - 1, h - 2);
+		canvas = slide.getGraphics();
+		canvas.setColor(new Color(160, 160, 160));
+		canvas.fill(new Rectangle(0, 0, w - 1, h - 1));
+		canvas.setColor(new Color(255, 255, 255));
+		canvas.drawLine(0, 0, w - 1, 0);
+		canvas.drawLine(0, 0, 0, h - 1);
+		canvas.setColor(new Color(70, 70, 70));
+		canvas.drawLine(w - 2, 1, w - 2, h - 1);
+		canvas.drawLine(1, h - 2, w - 1, h - 2);
+		canvas.flush();
 		
 		float fWidth = width - xOffSet * 2, fMax = max, fValue = value, fMin = min;
 		graphic = new Image(width + xOffSet * 2, h);
-		s = graphic.getGraphics();
-		s.drawImage(box, xOffSet, h / 2 - (box.getHeight() / 2));
+		canvas = graphic.getGraphics();
+		canvas.drawImage(box, xOffSet, h / 2 - (box.getHeight() / 2));
 		valuex = (fWidth * (fValue - fMin)) / (fMax - fMin); // thanks wolframalpha
-		s.drawImage(slide, valuex, 0); 
+		canvas.drawImage(slide, valuex, 0); 
+		canvas.flush();
 		
 		changed = true;
 	}
@@ -87,14 +90,20 @@ public class Slider extends GUIControl
 	private void updateSlider() throws SlickException
 	{
 		float pos = valuex - slide.getWidth() / 2;
-		Graphics s = graphic.getGraphics();
-		s.clear();
-		s.drawImage(box, 2, slide.getHeight() / 2 - (box.getHeight() / 2));
+		canvas = graphic.getGraphics();
+		canvas.clear();
+		canvas.drawImage(box, 2, slide.getHeight() / 2 - (box.getHeight() / 2));
 		if (pos < 2)
 			pos = 2;
 		else if (pos >= box.getWidth() + 2) // these checks keep the slider within the bounds of its box
 			pos = box.getWidth() + 2;
-		s.drawImage(slide, pos, 0);
+		canvas.drawImage(slide, pos, 0);
+		if (GUIManager.debug)
+		{
+			canvas.setColor(Color.yellow);
+			canvas.drawRect(0, 0, width - 1, height - 1);
+		}
+		canvas.flush();
 	}
 
 	public void update(Graphics g)
@@ -113,7 +122,7 @@ public class Slider extends GUIControl
 			valuex = Cursor.getX() - gx;
 			int offset = (valuex <= width / 2 ? slide.getWidth() / 2 : 0);
 			valuex -= offset;
-			int check = Math.round((valuex * (max - min)) / width) + min;
+			long check = Math.round((valuex * (max - min)) / width) + min;
 			if (check >= min && check <= max)
 			{
 				value = check;
@@ -170,7 +179,7 @@ public class Slider extends GUIControl
 					valuex = Cursor.getX() - gx;
 					int offset = (valuex <= width / 2 ? slide.getWidth() / 2 : 0);
 					valuex -= offset;
-					int check = Math.round((valuex * (max - min)) / width) + min;
+					long check = Math.round((valuex * (max - min)) / width) + min;
 					if (check >= min && check <= max)
 					{
 						value = check;
@@ -217,6 +226,17 @@ public class Slider extends GUIControl
 			if (valueChange != null)
 				valueChange.execute(this.value, this);
 		}
+	}
+	
+	public void setRange(long max, long min)
+	{
+		this.max = max;
+		if (value > max)
+			value = max;
+		this.min = min;
+		if (value < min)
+			value = min;
+		changed = true;
 	}
 	
 	public long getValue()

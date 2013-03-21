@@ -102,6 +102,7 @@ public class Button extends GUIControl
 			canvas.drawLine(1, height - 1, width, height - 1);
 			canvas.setColor(new Color(0, 0, 0));
 			canvas.drawString(text, width / 2 - (GUIManager.guiFont.getWidth(text) / 2), height / 2 - (GUIManager.guiFont.getHeight(text) / 2));
+			canvas.flush();
 		}
 
 		if (pushed != null)
@@ -119,6 +120,7 @@ public class Button extends GUIControl
 			canvas.drawLine(1, height - 1, width, height - 1);
 			canvas.setColor(new Color(0, 0, 0));
 			canvas.drawString(text, width / 2 - (GUIManager.guiFont.getWidth(text) / 2) - 1, height / 2 - (GUIManager.guiFont.getHeight(text) / 2) - 1);
+			canvas.flush();
 		}
 	}
 

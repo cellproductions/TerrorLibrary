@@ -3,6 +3,7 @@ TODO:
 Container:
 * Container needs all mouse input controls added
 * fix widths to account for scroll bar (or horizontal scrolling?)
+* Make a ContainerGen class that inherits Container, Container stores images, ContainerGen stores images and generic objects
 
 
 Label:

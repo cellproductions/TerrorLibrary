@@ -124,6 +124,7 @@ public class ListBox extends GUIControl
 			canvas.fill(up);
 			canvas.fill(down);
 		}
+		canvas.flush();
 	}
 
 	public void update(Graphics g)
@@ -161,16 +162,6 @@ public class ListBox extends GUIControl
 
 		if (visible && graphic.getAlpha() > 0.00F)
 			g.drawImage(graphic, gx, gy);
-	}
-	
-	public void onMouseClick(GUIClickedFunction function)
-	{
-		mouseClick = function;
-	}
-	
-	public void onMouseOver(GUIMouseOverFunction function)
-	{
-		mouseOver = function;
 	}
 	
 	public void onSelectionChange(GUISelectionFunction function)
@@ -343,7 +334,7 @@ public class ListBox extends GUIControl
 		return height / (gapHeight - 5);
 	}
 
-	public String text(int index)
+	public String getText(int index)
 	{
 		return items.get(index);
 	}

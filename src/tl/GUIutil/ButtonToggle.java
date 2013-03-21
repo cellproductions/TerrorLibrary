@@ -52,6 +52,7 @@ public class ButtonToggle extends GUIControl
 		canvas.drawLine(1, height - 1, width, height - 1);
 		canvas.setColor(new Color(0, 0, 0));
 		canvas.drawString(text, width / 2 - (GUIManager.guiFont.getWidth(text) / 2), height / 2 - (GUIManager.guiFont.getHeight(text) / 2));
+		canvas.flush();
 	}
 
 	public void update(Graphics g)
@@ -91,6 +92,10 @@ public class ButtonToggle extends GUIControl
 		if (graphic != null)
 			if (visible && graphic.getAlpha() > 0.00F)
 				g.drawImage(graphic, gx, gy);
+	}
+	
+	public void mousePressed(int button, int x, int y)
+	{
 	}
 	
 	public void mouseReleased(int button, int x, int y)

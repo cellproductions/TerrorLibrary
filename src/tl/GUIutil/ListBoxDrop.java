@@ -9,13 +9,13 @@ import tl.Util.Cursor;
 
 public class ListBoxDrop extends ListBox
 {
-	private boolean dropped;
-	private static final int defH = 30; // box height, h is height of box once dropped
-	private int normalHeight;
+	protected boolean dropped;
+	protected static final int defH = 30; // box height, h is height of box once dropped
+	protected int normalHeight;
 	
-	private static final Color defSelected = new Color(168, 168, 168);
-	private Color newSelected = null; // colour of selected text chosen by the user (not yet implemented)
-	private boolean resizeable;
+	protected static final Color defSelected = new Color(168, 168, 168);
+	protected Color newSelected = null; // colour of selected text chosen by the user (not yet implemented)
+	protected boolean resizeable;
 	
 	public ListBoxDrop()
 	{
@@ -64,7 +64,7 @@ public class ListBoxDrop extends ListBox
 		changed = true;
 	}
 	
-	private void resize()
+	protected void resize()
 	{
 		int size = (int)(defH * numItems - gy);
 		if (size <= GUIManager.screenHeight - 1 && defH * numItems >= defH)
@@ -154,6 +154,12 @@ public class ListBoxDrop extends ListBox
 			canvas.draw(down);
 			canvas.fill(down);
 		}
+		if (GUIManager.debug)
+		{
+			canvas.setColor(Color.yellow);
+			canvas.drawRect(0, 0, width - 1, height - 1);
+		}
+		canvas.flush();
 	}
 	
 	public void update(Graphics g)
@@ -252,9 +258,9 @@ public class ListBoxDrop extends ListBox
 				}
 			}
 			
-			if (mouseClick != null) // mouseIsOver() is already checked at the top
+			if (mouseClick != null)
 			{
-				mouseClick.execute(-1, -1, -1, this);
+				mouseClick.execute(button, x, y, this);
 				changed = true;
 			}
 		}

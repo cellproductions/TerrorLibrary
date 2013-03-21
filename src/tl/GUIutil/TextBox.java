@@ -64,15 +64,16 @@ public class TextBox extends GUIControl
 	@SuppressWarnings("deprecation")
 	private void updateText() throws SlickException
 	{
-		Graphics s = graphic.getGraphics();
-		s.clear();
-		s.setFont(GUIManager.guiFont);
-		s.setColor(new Color(0, 0, 0));
-		s.draw(new Rectangle(1, 1, width - 1, height - 1));
+		canvas = graphic.getGraphics();
+		canvas.clear();
+		canvas.setFont(GUIManager.guiFont);
+		canvas.setColor(new Color(0, 0, 0));
+		canvas.draw(new Rectangle(1, 1, width - 1, height - 1));
 		int w = GUIManager.guiFont.getWidth(toDraw + "_");
 		if (w > width + 16)
 			toDraw = toDraw.substring(0, toDraw.length() - 1);
-		s.drawString(toDraw, 3, height / 2 - (GUIManager.guiFont.getHeight(toDraw) / 2) - 2);
+		canvas.drawString(toDraw, 3, height / 2 - (GUIManager.guiFont.getHeight(toDraw) / 2) - 2);
+		canvas.flush();
 	}
 	
 	private boolean backspaceDown = false;

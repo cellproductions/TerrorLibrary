@@ -120,7 +120,7 @@ public class GUI implements GUIInterface
 		s.fillRect(0, 0, w - 1, h - 1);
 		s.setColor(border);
 		s.drawRect(0, 0, w - 1, h - 1);
-		s.destroy();
+		s.flush();
 		graphic.setAlpha(transparency);
 		controls = new ArrayList<Control>();
 

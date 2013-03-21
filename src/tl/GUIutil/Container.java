@@ -125,6 +125,7 @@ public class Container<T> extends GUIControl
 					Graphics g = todraw.getGraphics();
 					g.setColor(Color.yellow);
 					g.drawRect(0, 0, iWidth - 1, iHeight - 1);
+					g.flush();
 				}
 				canvas.drawImage(todraw, (gap * (numhor + 1)) + numhor * iWidth, (gap * (vert + 1)) + vert * iHeight);
 				numhor++;
@@ -153,6 +154,7 @@ public class Container<T> extends GUIControl
 			canvas.fill(up);
 			canvas.fill(down);
 		}
+		canvas.flush();
 	}
 	
 	public void update(Graphics g)
