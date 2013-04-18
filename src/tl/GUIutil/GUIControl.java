@@ -42,6 +42,7 @@ public class GUIControl implements GUIInterface
 		height = 0;
 		enabled = true;
 		graphic = null;
+		visible = true;
 	}
 
 	public GUIControl(int i, int j, int w, int h)
@@ -51,10 +52,13 @@ public class GUIControl implements GUIInterface
 		width = w;
 		height = h;
 		enabled = true;
+		visible = true;
 	}
 
-	public void setGUI(GUI g)
+	public void setGUI(GUI g) throws TGUIException
 	{
+		if (g == null)
+			throw new TGUIException("owning GUI is null!");
 		owningGUI = g;
 		gx = owningGUI.x + x;
 		gy = owningGUI.y + y;

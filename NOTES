@@ -1,5 +1,9 @@
 TODO:
 
+ButtonToggle:
+* set 'index' to protected, remove oldIndex, make sure setIndex() throws an exception
+
+
 Container:
 * Container needs all mouse input controls added
 * fix widths to account for scroll bar (or horizontal scrolling?)
@@ -53,6 +57,7 @@ GUI:
 
 * Cursor needs to have a setPointerPosition(int x, int y) that sets, on its image, a spot where it gets its x and y positions from
 * implement debugging for all GUI/GUIControls (draws a yellow rectangle around them, 0, 0, width - 1, height - 1)
+* check exception handling throughout gui stuff
 
 
 BUGS:

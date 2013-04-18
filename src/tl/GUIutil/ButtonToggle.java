@@ -147,15 +147,20 @@ public class ButtonToggle extends GUIControl
 		toggles.add(item);
 	}
 	
-	public void setIndex(int index)
+	public void setIndex(int index) throws TGUIException
 	{
-		if (index > -1 && index < toggles.size())
-		{
-			oldIndex = this.index;
-			this.index = index;
-			text = toggles.get(index);
-			changed = true;
-		}
+		if (index < 0 || index >= toggles.size())
+			throw new TGUIException("index " + index + " out of bounds!");
+		
+		oldIndex = this.index;
+		this.index = index;
+		text = toggles.get(index);
+		changed = true;
+	}
+	
+	public int getIndex()
+	{
+		return index;
 	}
 	
 	public void next()

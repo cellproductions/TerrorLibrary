@@ -172,15 +172,6 @@ public class ListBoxDrop extends ListBox
 				changed = true;
 			}
 		}
-		
-		if (hasChanged() > -1)
-		{
-			if (selectionChange != null)
-				selectionChange.execute(selected, this);
-			changed = true;
-		}
-		if (selected < 0 || selected >= numItems)
-			selected = oldIndex = -1;
 
 		try
 		{
@@ -244,15 +235,13 @@ public class ListBoxDrop extends ListBox
 					{
 						if (dropped)
 						{
-							int where = getIndexFromCoordinates(x, y - gy);
-							if (where > -1)
+							try
 							{
-								oldIndex = selected;
-								selected = where;
+								int where = getIndexFromCoordinates(x - gx, y - gy); // place here instead of in setSelected() so that exception isnt thrown in mid call
+								setSelected(where);
 								dropped = false;
-								 // basically calls onSelectionChange
-								changed = true;
 							}
+							catch (TGUIException e) {} // do nothing in this case
 						}
 					}
 				}
@@ -266,11 +255,11 @@ public class ListBoxDrop extends ListBox
 		}
 	}
 	
-	public int getIndexFromCoordinates(float xx, float yy)
+	public int getIndexFromCoordinates(float xx, float yy) throws TGUIException
 	{
 		int where = (int)((yy) / gapHeight) + numDown;
 		if (where >= numItems || !mouseIsOverItem())
-			return -1;
+			throw new TGUIException("coordinates " + x + "," + y + " do not match any index!");
 		return where;
 	}
 	
@@ -300,18 +289,22 @@ public class ListBoxDrop extends ListBox
 		changed = true;
 	}
 
-	public void addItemAt(int i, String text)
+	public void addItemAt(int index, String text) throws TGUIException
 	{
-		items.add(i, new String(text));
+		if (index < 0 || index >= numItems)
+			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
+		items.add(index, new String(text));
 		numItems++;
 		if (resizeable)
 			resize();
 		changed = true;
 	}
 	
-	public void removeItem(int num)
+	public void removeItem(int index) throws TGUIException
 	{
-		items.remove(num);
+		if (index < 0 || index >= numItems)
+			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
+		items.remove(index);
 		numItems--;
 		if (!toobig)
 			numDown = 0;

@@ -217,15 +217,15 @@ public class Slider extends GUIControl
 		valueFinal = function;
 	}
 	
-	public void setValue(int value)
+	public void setValue(int value) throws TGUIException
 	{
-		if (value >= min && value <= max)
-		{
-			this.value = value;
-			changed = true;
-			if (valueChange != null)
-				valueChange.execute(this.value, this);
-		}
+		if (value < min || value > max)
+			throw new TGUIException("value " + value + " out of bounds! [" + min + "-" + max + "]");
+		
+		this.value = value;
+		changed = true;
+		if (valueChange != null)
+			valueChange.execute(this.value, this);
 	}
 	
 	public void setRange(long max, long min)

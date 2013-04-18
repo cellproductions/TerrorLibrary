@@ -81,7 +81,7 @@ public class GUI implements GUIInterface
 		numControls = 0;
 		controls = new ArrayList<Control>();
 
-		setvisibilities = true;
+		setvisibilities = !v;
 	}
 
 	public GUI(int i, int j, boolean v, int w, int h, float transparency) throws SlickException
@@ -99,7 +99,7 @@ public class GUI implements GUIInterface
 		graphic.setAlpha(transparency);
 		controls = new ArrayList<Control>();
 
-		setvisibilities = true;
+		setvisibilities = !v;
 	}
 
 	public GUI(int i, int j, boolean v, int w, int h, Color border, Color main, float transparency) throws SlickException
@@ -124,12 +124,19 @@ public class GUI implements GUIInterface
 		graphic.setAlpha(transparency);
 		controls = new ArrayList<Control>();
 
-		setvisibilities = true;
+		setvisibilities = !v;
 	}
 
 	public void addControl(String name, GUIControl control)
 	{
-		control.setGUI(this);
+		try
+		{
+			control.setGUI(this);
+		}
+		catch (TGUIException e)
+		{
+			e.printStackTrace();
+		}
 		Iterator<Control> itr = controls.iterator();
 		for (int i = 0; itr.hasNext(); ++i)
 		{
@@ -142,7 +149,7 @@ public class GUI implements GUIInterface
 		controls.add(new Control(name, control));
 	}
 
-	public void removeControl(String name)
+	public void removeControl(String name) throws TGUIException
 	{
 		Iterator<Control> itr = controls.iterator();
 		for (int i = 0; itr.hasNext(); ++i)
@@ -154,18 +161,27 @@ public class GUI implements GUIInterface
 				return;
 			}
 		}
+		throw new TGUIException("control '" + name + "' does not exist!");
 	}
 
-	public GUIControl getControl(String key)
+	public GUIControl getControl(String name)
 	{
 		Iterator<Control> itr = controls.iterator();
 		while (itr.hasNext())
 		{
 			Control c = itr.next();
-			if (c.name.equals(key))
+			if (c.name.equals(name))
 				return c.guiControl;
 		}
-		return null;
+		try
+		{
+			throw new TGUIException("control '" + name + "' does not exist!");
+		}
+		catch (TGUIException e)
+		{
+			e.printStackTrace();
+		}
+		return null; // here for the sake of syntax
 	}
 
 	public void setControlAlphas() // sets all controls' alphas of this GUI to this GUI's alpha
@@ -218,7 +234,8 @@ public class GUI implements GUIInterface
 		if (setvisibilities)
 		{
 			for (Control itr: controls)
-				itr.guiControl.setVisible(visible);
+				if (itr.guiControl.getVisibility() != visible)
+					itr.guiControl.setVisible(visible);
 			setvisibilities = false;
 		}
 		if (graphic.getAlpha() > 0.00F)

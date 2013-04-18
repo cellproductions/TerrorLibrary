@@ -20,8 +20,7 @@ public class Container<T> extends GUIControl
 	private int iHeight;
 	private int gap;
 	private boolean scaled;
-	public int selected;
-	private int oldIndex;
+	private int selected;
 	
 	GUISelectionFunction selectionChange;
 	
@@ -39,7 +38,6 @@ public class Container<T> extends GUIControl
 		scaled = false;
 		items = new ArrayList<Item>();
 		selected = -1;
-		oldIndex = selected;
 	}
 	
 	public Container(int x, int y, int w, int h, Color col) throws SlickException
@@ -58,7 +56,6 @@ public class Container<T> extends GUIControl
 		gap = 20;
 		scaled = false;
 		selected = -1;
-		oldIndex = selected;
 		changed = true;
 	}
 	
@@ -77,7 +74,6 @@ public class Container<T> extends GUIControl
 		scaled = true;
 		this.gap = gap;
 		selected = -1;
-		oldIndex = selected;
 		changed = true;
 	}
 	
@@ -202,15 +198,6 @@ public class Container<T> extends GUIControl
 			}
 		}
 		
-		if (hasChanged() > -1)
-		{
-			if (selectionChange != null)
-				selectionChange.execute(selected, this);
-			changed = true;
-		}
-		if (selected < 0 || selected >= numItems)
-			selected = oldIndex = -1;
-		
 		try
 		{
 			if (changed)
@@ -271,13 +258,12 @@ public class Container<T> extends GUIControl
 				else
 				{
 				*/
-				int where = getIndexFromCoordinates(x - gx, y - gy);
-				if (where > -1)
+				try
 				{
-					oldIndex = selected;
-					selected = where;
-					changed = true;
+					int where = getIndexFromCoordinates(x - gx, y - gy); // place here instead of in setSelected() so that exception isnt thrown in mid call
+					setSelected(where);
 				}
+				catch (TGUIException e) {} // do nothing in this case
 			}
 			
 			if (mouseClick != null) // mouseIsOver() is already checked at the top
@@ -288,11 +274,19 @@ public class Container<T> extends GUIControl
 		}
 	}
 	
-	protected int hasChanged()
+	public void setSelected(int index) throws TGUIException
 	{
-		if (oldIndex != selected)
-			return (oldIndex = selected);
-		return -1;
+		if (selected < -1 || selected >= numItems)
+			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
+		selected = index;
+		if (selectionChange != null)
+			selectionChange.execute(selected, this);
+		changed = true;
+	}
+	
+	public int getSelected()
+	{
+		return selected;
 	}
 	
 	private class Item
@@ -319,55 +313,66 @@ public class Container<T> extends GUIControl
 		changed = true;
 	}
 	
-	public void addItemAt(int pos, Image image, T object)
+	public void addItemAt(int index, Image image, T object) throws TGUIException
 	{
-		items.add(pos, new Item(image, object));
+		if (index < 0 || index >= numItems)
+			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
+		items.add(index, new Item(image, object));
 		numItems++;
 		changed = true;
 	}
 	
-	public void setItem(int pos, Image image, T object)
+	public void setItem(int index, Image image, T object) throws TGUIException
 	{
-		items.set(pos, new Item(image, object));
+		if (index < 0 || index >= numItems)
+			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
+		items.set(index, new Item(image, object));
 		changed = true;
 	}
 	
-	public void removeItem(int pos)
+	public void removeItem(int index) throws TGUIException
 	{
-		items.remove(pos);
+		if (index < 0 || index >= numItems)
+			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
+		items.remove(index);
 		numItems--;
 		if (!toobig)
 			numDown = 0;
 		changed = true;
 	}
 	
-	public void removeItem(T object)
+	public void removeItem(T object) throws TGUIException
 	{
-		if (items.contains(object))
-			items.remove(object);
+		if (!items.contains(object))
+			throw new TGUIException("object does not exist!");
+		items.remove(object);
 		numItems--;
 		if (!toobig)
 			numDown = 0;
 		changed = true;
 	}
 	
-	public Image getGraphic(int pos)
+	public Image getGraphic(int index) throws TGUIException
 	{
-		return items.get(pos).iGraphic;
+		if (index < 0 && index >= numItems)
+			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
+		return items.get(index).iGraphic;
 	}
 	
-	public T getObject(int pos)
+	public T getObject(int index) throws TGUIException
 	{
-		return items.get(pos).object;
+		if (index < 0 && index >= numItems)
+			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
+		return items.get(index).object;
 	}
 	
-	public int getIndexFromCoordinates(float x, float y)
+	public int getIndexFromCoordinates(float x, float y) throws TGUIException
 	{
 		int fitWidth = (int)Math.round(width / (iWidth + gap));
 		int column = (int)(x / (gap + iWidth));
 		int row = (int)(y / (gap + iHeight));
 		if ((row * fitWidth) + column < 0 || (row * fitWidth) + column >= numItems)
-			return -1;
+			throw new TGUIException("coordinates " + x + "," + y + " do not match any index!");
 		return (row * fitWidth) + column;
 	}
 	

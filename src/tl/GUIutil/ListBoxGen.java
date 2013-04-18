@@ -91,15 +91,6 @@ public class ListBoxGen<T> extends ListBox
 				changed = true;
 			}
 		}
-		
-		if (hasChanged() > -1)
-		{
-			if (selectionChange != null)
-				selectionChange.execute(selected, this);
-			changed = true;
-		}
-		if (selected < 0 || selected >= numItems)
-			selected = oldIndex = -1;
 
 		try
 		{
@@ -130,24 +121,30 @@ public class ListBoxGen<T> extends ListBox
 		changed = true;
 	}
 
-	public void addItemAt(int i, String text, T object)
+	public void addItemAt(int index, String text, T object) throws TGUIException
 	{
-		items.add(i, new Item(text, object));
+		if (index < 0 || index >= numItems)
+			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
+		items.add(index, new Item(text, object));
 		numItems++;
 		changed = true;
 	}
 
-	public void setItem(int num, String text, T object)
+	public void setItem(int index, String text, T object) throws TGUIException
 	{
-		Item item = items.get(num);
+		if (index < 0 || index >= numItems)
+			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
+		Item item = items.get(index);
 		item.text = text;
 		item.object = object;
 		changed = true;
 	}
 
-	public void removeItem(int num)
+	public void removeItem(int index) throws TGUIException
 	{
-		items.remove(num);
+		if (index < 0 || index >= numItems)
+			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
+		items.remove(index);
 		numItems--;
 		if (!toobig)
 			numDown = 0;
@@ -170,13 +167,17 @@ public class ListBoxGen<T> extends ListBox
 		return list;
 	}
 	
-	public String getText(int index)
+	public String getText(int index) throws TGUIException
 	{
+		if (index < 0 || index >= numItems)
+			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
 		return items.get(index).text;
 	}
 	
-	public T getObject(int index)
+	public T getObject(int index) throws TGUIException
 	{
+		if (index < 0 || index >= numItems)
+			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
 		return items.get(index).object;
 	}
 

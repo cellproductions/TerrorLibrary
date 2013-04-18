@@ -15,13 +15,12 @@ public class ListBox extends GUIControl
 {
 	protected List<String> items;
 	public int numItems;
-	public int selected;
+	protected int selected;
 	protected int numDown;
 	protected boolean toobig;
 	protected Color background;
 	
 	protected static int gapHeight = 25;
-	protected int oldIndex;
 	
 	GUISelectionFunction selectionChange;
 	
@@ -37,7 +36,6 @@ public class ListBox extends GUIControl
 		selected = -1;
 		numDown = 0;
 		toobig = false;
-		oldIndex = selected;
 		background = null;
 	}
 	
@@ -52,7 +50,6 @@ public class ListBox extends GUIControl
 		selected = -1;
 		numDown = 0;
 		toobig = false;
-		oldIndex = selected;
 		changed = true;
 	}
 
@@ -67,7 +64,6 @@ public class ListBox extends GUIControl
 		selected = index;
 		numDown = 0;
 		toobig = false;
-		oldIndex = selected;
 		changed = true;
 	}
 
@@ -138,15 +134,6 @@ public class ListBox extends GUIControl
 			}
 		}
 		
-		if (hasChanged() > -1)
-		{
-			if (selectionChange != null)
-				selectionChange.execute(selected, this);
-			changed = true;
-		}
-		if (selected < 0 || selected >= numItems)
-			selected = oldIndex = -1;
-
 		try
 		{
 			if (changed)
@@ -195,13 +182,12 @@ public class ListBox extends GUIControl
 				}
 				else
 				{
-					int where = getIndexFromCoordinates(x, y - gy);
-					if (where > -1)
+					try
 					{
-						oldIndex = selected;
-						selected = where;
-						changed = true;
+						int where = getIndexFromCoordinates(x - gx, y - gy); // place here instead of in setSelected() so that exception isnt thrown in mid call
+						setSelected(where);
 					}
+					catch (TGUIException e) {} // do nothing in this case
 				}
 			}
 			
@@ -243,19 +229,27 @@ public class ListBox extends GUIControl
 		return x >= width - 12 && x < width - 2 && y >= 0 && y < height;
 	}
 	
-	public int getIndexFromCoordinates(float xx, float yy)
+	public int getIndexFromCoordinates(float xx, float yy) throws TGUIException
 	{
 		int where = (int)((yy) / gapHeight) + numDown;
 		if (where >= numItems || !mouseIsOverItem())
-			return -1;
+			throw new TGUIException("coordinates " + x + "," + y + " do not match any index!");
 		return where;
 	}
 	
-	protected int hasChanged()
+	public void setSelected(int index) throws TGUIException
 	{
-		if (oldIndex != selected)
-			return (oldIndex = selected);
-		return -1;
+		if (selected < -1 || selected >= numItems)
+			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
+		selected = index;
+		if (selectionChange != null)
+			selectionChange.execute(selected, this);
+		changed = true;
+	}
+	
+	public int getSelected()
+	{
+		return selected;
 	}
 
 	public boolean isEmpty()
@@ -270,22 +264,28 @@ public class ListBox extends GUIControl
 		changed = true;
 	}
 
-	public void addItemAt(int i, String text)
+	public void addItemAt(int index, String text) throws TGUIException
 	{
-		items.add(i, new String(text));
+		if (index < 0 || index >= numItems)
+			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
+		items.add(index, new String(text));
 		numItems++;
 		changed = true;
 	}
 
-	public void setItem(int num, String t)
+	public void setItem(int index, String t) throws TGUIException
 	{
-		items.set(num, t);
+		if (index < 0 || index >= numItems)
+			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
+		items.set(index, t);
 		changed = true;
 	}
 
-	public void removeItem(int num)
+	public void removeItem(int index) throws TGUIException
 	{
-		items.remove(num);
+		if (index < 0 || index >= numItems)
+			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
+		items.remove(index);
 		numItems--;
 		if (!toobig)
 			numDown = 0;
@@ -334,8 +334,10 @@ public class ListBox extends GUIControl
 		return height / (gapHeight - 5);
 	}
 
-	public String getText(int index)
+	public String getText(int index) throws TGUIException
 	{
+		if (index < 0 || index >= numItems)
+			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
 		return items.get(index);
 	}
 
