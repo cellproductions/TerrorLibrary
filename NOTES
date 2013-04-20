@@ -49,7 +49,7 @@ GUIControls:
 * add constant for font height to be used in all GUIControls
 * make owningGUI protected
 * should draw outside of the size of the owningGUI
-* implement GUILoopFunction (if not null, call upon every update or draw, basically upon every loop) (see Container)
+* remove the GUILoop function, its is basically the same as the game loop, not needed
 
 
 GUI:
