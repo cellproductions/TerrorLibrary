@@ -19,14 +19,19 @@ public class GUI implements GUIInterface
 	public int ID;
 	protected int numControls; // may be obselete
 	protected Color background;
+	protected Color border;
 	public List<Control> controls;
+	protected boolean changed;
+	protected String imagePath;
+	protected float transparency = 1;
+	private boolean setT = false; // set transparency on creation
 
 	protected GUIFunction mouseClick;
 	protected GUIFunction mouseOver;
 
 	private boolean setvisibilities = false;
 
-	public GUI()
+	public GUI() // NOT SURE IF I NEED THIS
 	{
 		x = 0;
 		y = 0;
@@ -38,8 +43,9 @@ public class GUI implements GUIInterface
 		GUIManager.numGUIs++;
 		numControls = 0;
 		controls = new ArrayList<Control>();
+		changed = true;
 	}
-
+/*	NOT YET SUPPORTED
 	public GUI(String s)
 	{
 		x = 0;
@@ -59,8 +65,10 @@ public class GUI implements GUIInterface
 		GUIManager.numGUIs++;
 		numControls = 0;
 		controls = new ArrayList<Control>();
+		changed = false;
 	}
-
+*/
+/*
 	public GUI(String s, int i, int j, boolean v)
 	{
 		x = i;
@@ -80,10 +88,11 @@ public class GUI implements GUIInterface
 		GUIManager.numGUIs++;
 		numControls = 0;
 		controls = new ArrayList<Control>();
+		changed = true;
 
 		setvisibilities = !v;
 	}
-
+*/
 	public GUI(int i, int j, boolean v, int w, int h, float transparency) throws SlickException
 	{
 		x = i;
@@ -95,36 +104,20 @@ public class GUI implements GUIInterface
 		GUIManager.numGUIs++;
 		numControls = 0;
 
-		graphic = new Image(w, h);
-		graphic.setAlpha(transparency);
+		this.transparency = transparency;
+		setT = true;
 		controls = new ArrayList<Control>();
+		changed = true;
 
 		setvisibilities = !v;
 	}
 
 	public GUI(int i, int j, boolean v, int w, int h, Color border, Color main, float transparency) throws SlickException
 	{
-		x = i;
-		y = j;
-		visible = v;
-		width = w;
-		height = h;
-		ID = GUIManager.numGUIs;
-		GUIManager.numGUIs++;
-		numControls = 0;
+		this(i, j, v, w, h, transparency);
+		
 		background = main;
-
-		graphic = new Image(w, h);
-		Graphics s = graphic.getGraphics();
-		s.setColor(main);
-		s.fillRect(0, 0, w - 1, h - 1);
-		s.setColor(border);
-		s.drawRect(0, 0, w - 1, h - 1);
-		s.flush();
-		graphic.setAlpha(transparency);
-		controls = new ArrayList<Control>();
-
-		setvisibilities = !v;
+		this.border = border;
 	}
 
 	public void addControl(String name, GUIControl control)
@@ -223,10 +216,42 @@ public class GUI implements GUIInterface
 			control.gy = y + yy;
 		}
 	}
+	
+	public void setSize(int w, int h)
+	{
+		width = w;
+		height = h;
+		try
+		{
+			graphic.destroy();
+			graphic = null;
+		}
+		catch (SlickException e)
+		{
+			e.printStackTrace();
+		}
+		changed = true;
+	}
 
 	public boolean getVisibility()
 	{
 		return visible;
+	}
+	
+	public void updateGui() throws SlickException
+	{
+		if (graphic == null)
+			graphic = new Image(width, height);
+		if (setT)
+			graphic.setAlpha(transparency);
+		Graphics s = graphic.getGraphics();
+		s.setColor(background);
+		s.fillRect(0, 0, width - 1, height - 1);
+		s.setColor(border);
+		s.drawRect(0, 0, width - 1, height - 1);
+		s.flush();
+		
+		changed = false;
 	}
 
 	public void update(Graphics g)
@@ -237,6 +262,17 @@ public class GUI implements GUIInterface
 				if (itr.guiControl.getVisibility() != visible)
 					itr.guiControl.setVisible(visible);
 			setvisibilities = false;
+		}
+		if (changed)
+		{
+			try
+			{
+				updateGui();
+			}
+			catch (SlickException e)
+			{
+				e.printStackTrace();
+			}
 		}
 		if (graphic.getAlpha() > 0.00F)
 			if (visible)

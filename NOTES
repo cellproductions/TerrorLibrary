@@ -48,6 +48,8 @@ GUIControls:
 * instead of using new Color(), create pre made colors in GUIManager
 * add constant for font height to be used in all GUIControls
 * make owningGUI protected
+* should draw outside of the size of the owningGUI
+* implement GUILoopFunction (if not null, call upon every update or draw, basically upon every loop) (see Container)
 
 
 GUI:
@@ -58,6 +60,7 @@ GUI:
 * Cursor needs to have a setPointerPosition(int x, int y) that sets, on its image, a spot where it gets its x and y positions from
 * implement debugging for all GUI/GUIControls (draws a yellow rectangle around them, 0, 0, width - 1, height - 1)
 * check exception handling throughout gui stuff
+* make sure that all GUI and GUIControls can handle using an image
 
 
 BUGS:

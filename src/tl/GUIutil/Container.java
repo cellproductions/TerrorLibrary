@@ -23,6 +23,7 @@ public class Container<T> extends GUIControl
 	private int selected;
 	
 	GUISelectionFunction selectionChange;
+	GUILoopFunction looped;
 	
 	public Container()
 	{
@@ -198,6 +199,12 @@ public class Container<T> extends GUIControl
 			}
 		}
 		
+		if (looped != null)
+		{
+			looped.execute(this);
+			changed = true;
+		}
+		
 		try
 		{
 			if (changed)
@@ -228,6 +235,11 @@ public class Container<T> extends GUIControl
 	public void onSelectionChange(GUISelectionFunction function)
 	{
 		selectionChange = function;
+	}
+	
+	public void onLoop(GUILoopFunction function)
+	{
+		looped = function;
 	}
 	
 	public void mousePressed(int button, int x, int y)
