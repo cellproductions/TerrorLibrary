@@ -201,6 +201,11 @@ public class GUI implements GUIInterface
 		for (Control itr: controls)
 			itr.guiControl.setVisible(visible);
 	}
+	
+	public boolean getVisibility()
+	{
+		return visible;
+	}
 
 	public void setPosition(float i, float j)
 	{
@@ -231,11 +236,6 @@ public class GUI implements GUIInterface
 			e.printStackTrace();
 		}
 		changed = true;
-	}
-
-	public boolean getVisibility()
-	{
-		return visible;
 	}
 	
 	public void updateGui() throws SlickException

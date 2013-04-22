@@ -1,9 +1,10 @@
 package tl.GUIutil;
 
-import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+
+import tl.GUIutil.GUIManager.GUIColor;
 
 public class Button extends GUIControl
 {
@@ -92,15 +93,15 @@ public class Button extends GUIControl
 			canvas = normal.getGraphics();
 			canvas.clear();
 			canvas.setFont(GUIManager.guiFont);
-			canvas.setColor(new Color(160, 160, 160));
+			canvas.setColor(GUIColor.BUTTON_MAIN.get());
 			canvas.fillRect(0, 0, width, height);
-			canvas.setColor(new Color(255, 255, 255));
+			canvas.setColor(GUIColor.WHITE.get());
 			canvas.drawLine(0, 0, width, 0);
 			canvas.drawLine(0, 0, 0, height);
-			canvas.setColor(new Color(70, 70, 70));
+			canvas.setColor(GUIColor.BUTTON_BORDER.get());
 			canvas.drawLine(width - 1, 1, width - 1, height);
 			canvas.drawLine(1, height - 1, width, height - 1);
-			canvas.setColor(new Color(0, 0, 0));
+			canvas.setColor(GUIColor.BLACK.get());
 			canvas.drawString(text, width / 2 - (GUIManager.guiFont.getWidth(text) / 2), height / 2 - (GUIManager.guiFont.getHeight(text) / 2));
 			canvas.flush();
 		}
@@ -110,15 +111,15 @@ public class Button extends GUIControl
 			canvas = pushed.getGraphics();
 			canvas.clear();
 			canvas.setFont(GUIManager.guiFont);
-			canvas.setColor(new Color(160, 160, 160));
+			canvas.setColor(GUIColor.BUTTON_MAIN.get());
 			canvas.fillRect(0, 0, width, height);
-			canvas.setColor(new Color(70, 70, 70));
+			canvas.setColor(GUIColor.BUTTON_BORDER.get());
 			canvas.drawLine(0, 0, width, 0);
 			canvas.drawLine(0, 0, 0, height);
-			canvas.setColor(new Color(255, 255, 255));
+			canvas.setColor(GUIColor.WHITE.get());
 			canvas.drawLine(width - 1, 1, width - 1, height);
 			canvas.drawLine(1, height - 1, width, height - 1);
-			canvas.setColor(new Color(0, 0, 0));
+			canvas.setColor(GUIColor.BLACK.get());
 			canvas.drawString(text, width / 2 - (GUIManager.guiFont.getWidth(text) / 2) - 1, height / 2 - (GUIManager.guiFont.getHeight(text) / 2) - 1);
 			canvas.flush();
 		}

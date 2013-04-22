@@ -50,6 +50,7 @@ GUIControls:
 * make owningGUI protected
 * should draw outside of the size of the owningGUI
 * remove the GUILoop function, its is basically the same as the game loop, not needed
+* use GUIColor colours
 
 
 GUI:
