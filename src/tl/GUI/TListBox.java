@@ -1,81 +1,70 @@
-package tl.GUIutil;
+package tl.GUI;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Polygon;
 
-import tl.Util.Cursor;
+import tl.GUI.TGUIManager.GUIColor;
+import tl.Util.TCursor;
 
-public class ListBox extends GUIControl
+public class TListBox extends TGUIComponent implements TIGUICollection
 {
+	public static final ComponentType type = ComponentType.listBox;
 	protected List<String> items;
-	public int numItems;
+	protected int numItems;
 	protected int selected;
 	protected int numDown;
 	protected boolean toobig;
-	protected Color background;
+	protected GUIColor background;
 	
 	protected static int gapHeight = 25;
 	
-	GUISelectionFunction selectionChange;
+	TGUISelectionEvent selectionChange;
 	
-	protected Color black = new Color(0, 0, 0);
-
-	public ListBox()
+	public TListBox()
 	{
 		super();
-		type = GUIControl.ControlType.listBox;
-		graphic = null;
-		numItems = 0;
+	}
+
+	public TListBox(TGUIComponent parent)
+	{
+		super(parent);
 		items = new ArrayList<String>();
 		selected = -1;
-		numDown = 0;
-		toobig = false;
-		background = null;
 	}
 	
-	public ListBox(int x, int y, int w, int h) throws SlickException
+	public TListBox(TGUIComponent parent, float x, float y, int w, int h) throws SlickException
 	{
-		super(x, y, w, h);
-		type = GUIControl.ControlType.listBox;
-		background = null;
-		graphic = new Image(w, h);
-		numItems = 0;
+		super(parent, x, y, w, h);
 		items = new ArrayList<String>();
 		selected = -1;
-		numDown = 0;
-		toobig = false;
 		changed = true;
 	}
 
-	public ListBox(int x, int y, int w, int h, int index) throws SlickException
+	public TListBox(TGUIComponent parent, float x, float y, int w, int h, int index) throws SlickException
 	{
-		super(x, y, w, h);
-		type = GUIControl.ControlType.listBox;
-		background = null;
-		graphic = new Image(w, h);
-		numItems = 0;
+		super(parent, x, y, w, h);
 		items = new ArrayList<String>();
 		selected = index;
-		numDown = 0;
-		toobig = false;
 		changed = true;
 	}
 
+	@SuppressWarnings("static-access")
 	private void updateLB() throws SlickException
 	{
+		if (graphic == null)
+			graphic = new Image(width, height);
 		canvas = graphic.getGraphics();
 		canvas.clear();
-		canvas.setColor(black);
+		canvas.setColor(GUIColor.BLACK.get());
 		canvas.drawRect(0, 0, width - 1, height - 1);
-		canvas.setFont(GUIManager.guiFont);
-		if (owningGUI.background != null)
-			background = owningGUI.background;
+		canvas.setFont(TGUIManager.guiFont);
+		if (parent.type == ComponentType.component)
+			background = parent.background;
 		
 		int fontHeight = gapHeight - 5;
 
@@ -86,11 +75,11 @@ public class ListBox extends GUIControl
 				toobig = false;
 				if (numDown + i < numItems)
 				{
-					canvas.setColor(black);
+					canvas.setColor(GUIColor.BLACK.get());
 					if (numDown + i == selected) // draw the black box underneath the text if selected
 					{
 						canvas.fillRect(1, i * (height / (height / fontHeight)) + 3, width - 15, fontHeight + 2);
-						canvas.setColor(background != null ? background : new Color(168, 168, 168));
+						canvas.setColor(background != null ? background.get() : GUIColor.LISTBOX_BACKGROUND.get());
 					}
 					canvas.drawString(items.get(i + numDown), 3, i * (height / (height / fontHeight)));
 				}
@@ -104,7 +93,7 @@ public class ListBox extends GUIControl
 
 		if (toobig)
 		{
-			canvas.setColor(black);
+			canvas.setColor(GUIColor.BLACK.get());
 			canvas.drawLine(width - 13, height / 2, width - 1, height / 2);
 			canvas.drawLine(width - 14, 1, width - 14, height);
 			Polygon up = new Polygon();
@@ -151,7 +140,7 @@ public class ListBox extends GUIControl
 			g.drawImage(graphic, gx, gy);
 	}
 	
-	public void onSelectionChange(GUISelectionFunction function)
+	public void onSelectionChange(TGUISelectionEvent function)
 	{
 		selectionChange = function;
 	}
@@ -164,7 +153,7 @@ public class ListBox extends GUIControl
 				return;
 			if (button == 0)
 			{
-				if (isMouseWithinScroll())
+				if (mouseIsWithinScroll())
 				{
 					if (toobig)
 					{
@@ -217,15 +206,15 @@ public class ListBox extends GUIControl
 		}
 	}
 	
-	public boolean mouseIsOverItem()
+	protected boolean mouseIsOverItem()
 	{
-		return mouseIsOver() && !isMouseWithinScroll();
+		return mouseIsOver() && !mouseIsWithinScroll();
 	}
 	
-	private boolean isMouseWithinScroll()
+	protected boolean mouseIsWithinScroll()
 	{
-		int x = (int)(Cursor.getX() - gx);
-		int y = (int)(Cursor.getY() - gy);
+		int x = (int)(TCursor.getX() - gx);
+		int y = (int)(TCursor.getY() - gy);
 		return x >= width - 12 && x < width - 2 && y >= 0 && y < height;
 	}
 	
@@ -340,6 +329,13 @@ public class ListBox extends GUIControl
 			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
 		return items.get(index);
 	}
+	
+	public void sort(TSortDirection direction)
+	{
+		java.util.Collections.sort(items);
+		if (direction == TSortDirection.SORT_HIGHEST)
+			java.util.Collections.reverse(items);
+	}
 
 	public void clear()
 	{
@@ -349,5 +345,10 @@ public class ListBox extends GUIControl
 		toobig = false;
 		selected = -1;
 		changed = true;
+	}
+
+	public int getSize()
+	{
+		return numItems;
 	}
 }

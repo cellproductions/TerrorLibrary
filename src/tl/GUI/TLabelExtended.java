@@ -4,7 +4,7 @@
  * needs the check variable to check if the extended label needs updating
  */
 
-package tl.GUIutil;
+package tl.GUI;
 
 import java.util.ArrayList;
 
@@ -13,16 +13,14 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
-public class LabelExtended extends Label
+public class TLabelExtended extends TLabel
 {
+	public static final ComponentType type = ComponentType.labelExtended;
 	private int size;
 	
-	public LabelExtended(int x, int y, int w, String t) throws SlickException
+	public TLabelExtended(TGUIComponent parent, float x, float y, int w, String t) throws SlickException
 	{
-		super(x, y, w, 0, t);
-		type = GUIControl.ControlType.labelExtended;
-		width = w;
-		graphic = null;
+		super(parent, x, y, w, 0, t);
 		
 		toDraw = text;
 		int h = 1;
@@ -66,7 +64,7 @@ public class LabelExtended extends Label
 		
 		canvas = graphic.getGraphics();
 		canvas.clear();
-		canvas.setFont(GUIManager.guiFont);
+		canvas.setFont(TGUIManager.guiFont);
 		canvas.setColor(new Color(0, 0, 0));
 		int size = list.size();
 		for (int i = 0; i < size; i++)
@@ -76,7 +74,6 @@ public class LabelExtended extends Label
 	
 	public void update(Graphics g)
 	{
-		graphic.setAlpha(owningGUI.graphic.getAlpha());
 		try
 		{
 			if (changed)

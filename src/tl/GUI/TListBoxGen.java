@@ -1,39 +1,47 @@
-package tl.GUIutil;
+package tl.GUI;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Polygon;
 
-public class ListBoxGen<T> extends ListBox
+import tl.GUI.TGUIManager.GUIColor;
+
+public class TListBoxGen<T> extends TListBox
 {
+	public static final ComponentType type = ComponentType.listBoxGen;
 	public List<Item> items;
 	
-	public ListBoxGen(int x, int y, int w, int h) throws SlickException
+	public TListBoxGen()
 	{
-		super(x, y, w, h);
+		super();
+	}
+	
+	public TListBoxGen(TGUIComponent parent, float x, float y, int w, int h) throws SlickException
+	{
+		super(parent, x, y, w, h);
 		items = new ArrayList<Item>();
 	}
 	
-	public ListBoxGen(int x, int y, int w, int h, int index) throws SlickException
+	public TListBoxGen(TGUIComponent parent, float x, float y, int w, int h, int index) throws SlickException
 	{
-		super(x, y, w, h, index);
+		super(parent, x, y, w, h, index);
 		items = new ArrayList<Item>();
 	}
 	
+	@SuppressWarnings("static-access")
 	private void updateLB() throws SlickException
 	{
 		canvas = graphic.getGraphics();
 		canvas.clear();
-		canvas.setColor(black);
+		canvas.setColor(GUIColor.BLACK.get());
 		canvas.drawRect(0, 0, width - 1, height - 1);
-		canvas.setFont(GUIManager.guiFont);
-		if (owningGUI.background != null)
-			background = owningGUI.background;
+		canvas.setFont(TGUIManager.guiFont);
+		if (parent.type == ComponentType.component)
+			background = parent.background;
 		
 		int fontHeight = gapHeight - 5;
 
@@ -44,11 +52,11 @@ public class ListBoxGen<T> extends ListBox
 				toobig = false;
 				if (numDown + i < numItems)
 				{
-					canvas.setColor(black);
+					canvas.setColor(GUIColor.BLACK.get());
 					if (numDown + i == selected) // draw the black box underneath the text if selected
 					{
 						canvas.fillRect(1, i * (height / (height / fontHeight)) + 3, width - 15, fontHeight + 2);
-						canvas.setColor(background != null ? background : new Color(168, 168, 168));
+						canvas.setColor(background != null ? background.get() : GUIColor.LISTBOX_BACKGROUND.get());
 					}
 					canvas.drawString(items.get(i + numDown).text, 3, i * (height / (height / fontHeight)));
 				}
@@ -62,7 +70,7 @@ public class ListBoxGen<T> extends ListBox
 
 		if (toobig)
 		{
-			canvas.setColor(black);
+			canvas.setColor(GUIColor.BLACK.get());
 			canvas.drawLine(width - 13, height / 2, width - 1, height / 2);
 			canvas.drawLine(width - 14, 1, width - 14, height);
 			Polygon up = new Polygon();
@@ -191,7 +199,14 @@ public class ListBoxGen<T> extends ListBox
 		changed = true;
 	}
 	
-	private class Item
+	public void sort(TSortDirection direction)
+	{
+		java.util.Collections.sort(items);
+		if (direction == TSortDirection.SORT_HIGHEST)
+			java.util.Collections.reverse(items);
+	}
+	
+	private class Item implements Comparable<Item>
 	{
 		public String text;
 		public T object;
@@ -200,6 +215,12 @@ public class ListBoxGen<T> extends ListBox
 		{
 			this.text = text;
 			this.object = object;
+		}
+
+		public int compareTo(Item o)
+		{
+			int comp = text.compareTo(o.text);
+			return comp == 0 ? -1 : comp;
 		}
 	}
 }

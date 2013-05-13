@@ -1,4 +1,4 @@
-package tl.GUIutil;
+package tl.GUI;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -20,30 +20,30 @@ import org.newdawn.slick.SlickException;
  * @author Callum
  *
  */
-public class Label extends GUIControl
+public class TLabel extends TGUIComponent
 {
+	public static final ComponentType type = ComponentType.label;
 	protected String text;
 	protected String oldText;
 	protected String toDraw;
 	
-	protected GUITextFunction textChange;
-
-	public Label()
+	protected TGUITextEvent textChange;
+	
+	public TLabel()
 	{
 		super();
-		type = GUIControl.ControlType.label;
-		text = oldText = null;
-		toDraw = null;
-		priority = 0;
 	}
 
-	public Label(int x, int y, int w, int h, String t) throws SlickException
+	public TLabel(TGUIComponent parent)
 	{
-		super(x, y, w, h);
-		type = GUIControl.ControlType.label;
+		super(parent);
+		text = oldText = "";
+	}
+
+	public TLabel(TGUIComponent parent, float x, float y, int w, int h, String t) throws SlickException
+	{
+		super(parent, x, y, w, h);
 		text = oldText = t;
-		priority = 0;
-		graphic = new Image(w, h);
 		changed = true;
 	}
 
@@ -64,14 +64,16 @@ public class Label extends GUIControl
 		else
 			list.add(toDraw);
 		
+		if (graphic == null)
+			graphic = new Image(width, height);
 		canvas = graphic.getGraphics();
 		canvas.clear();
-		canvas.setFont(GUIManager.guiFont);
+		canvas.setFont(TGUIManager.guiFont);
 		canvas.setColor(new Color(0, 0, 0));
 		Iterator<String> itr = list.iterator();
 		for (int i = 0; itr.hasNext(); i++)
 			canvas.drawString(itr.next(), 0, i * 24); //Config.font.getHeight(list.get(i)));// h / 2 - (Config.font.getHeight(t) / 2));
-		if (GUIManager.debug)
+		if (TGUIManager.debug)
 		{
 			canvas.setColor(Color.yellow);
 			canvas.drawRect(0, 0, width - 1, height - 1);
@@ -121,12 +123,12 @@ public class Label extends GUIControl
 		}
 	}
 	
-	public void onMouseClick(GUIClickedFunction function)
+	public void onMouseClick(TGUIClickedEvent function)
 	{
 		mouseClick = function;
 	}
 	
-	public void onTextChange(GUITextFunction function)
+	public void onTextChange(TGUITextEvent function)
 	{
 		textChange = function;
 	}
@@ -152,7 +154,7 @@ public class Label extends GUIControl
 		for (String s : list)
 		{
 			@SuppressWarnings("deprecation")
-			int size = GUIManager.guiFont.getWidth(s);
+			int size = TGUIManager.guiFont.getWidth(s);
 			if (biggest < size)
 				biggest = size;
 		}

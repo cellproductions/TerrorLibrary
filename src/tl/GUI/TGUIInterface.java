@@ -1,8 +1,8 @@
-package tl.GUIutil;
+package tl.GUI;
 
 import org.newdawn.slick.Graphics;
 
-public interface GUIInterface
+public interface TGUIInterface
 {
 	public void update(Graphics g);
 	public void mousePressed(int button, int x, int y);

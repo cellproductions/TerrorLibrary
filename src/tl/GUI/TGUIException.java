@@ -1,4 +1,4 @@
-package tl.GUIutil;
+package tl.GUI;
 
 public class TGUIException extends Exception
 {
@@ -11,6 +11,6 @@ public class TGUIException extends Exception
 	
 	public TGUIException(String message)
 	{
-		super(message);
+		super("id: " + message);
 	}
 }

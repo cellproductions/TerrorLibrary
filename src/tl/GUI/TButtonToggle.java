@@ -1,48 +1,51 @@
-package tl.GUIutil;
+package tl.GUI;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayList;
 
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
-import tl.GUIutil.GUIManager.GUIColor;
+import tl.GUI.TGUIManager.GUIColor;
 
-public class ButtonToggle extends GUIControl
+public class TButtonToggle extends TGUIComponent
 {
+	public static ComponentType type = ComponentType.buttonToggle;
 	public String text;
-	private List<String> toggles;
+	private ArrayList<String> toggles;
 	public int index;
 	public int oldIndex;
 	
-	GUISelectionFunction selectionChange;
+	TGUISelectionEvent selectionChange;
 
-	public ButtonToggle()
+	public TButtonToggle()
 	{
 		super();
-		type = GUIControl.ControlType.buttonToggle;
-		text = null;
-		toggles = new LinkedList<String>();
 	}
 	
-	public ButtonToggle(int x, int y, int w, int h) throws SlickException
+	public TButtonToggle(TGUIComponent parent)
 	{
-		super(x, y, w, h);
-		type = GUIControl.ControlType.buttonToggle;
+		super(parent);
 		text = "";
-		index = oldIndex = 0;
-		graphic = new Image(w, h);
-		toggles = new LinkedList<String>();
+		toggles = new ArrayList<String>();
+	}
+	
+	public TButtonToggle(TGUIComponent parent, float x, float y, int w, int h) throws SlickException
+	{
+		super(parent, x, y, w, h);
+		text = "";
+		toggles = new ArrayList<String>();
 		changed = true;
 	}
 
 	@SuppressWarnings("deprecation")
 	private void updateB() throws SlickException
 	{
+		if (graphic == null)
+			graphic = new Image(width, height);
 		canvas = graphic.getGraphics();
 		canvas.clear();
-		canvas.setFont(GUIManager.guiFont);
+		canvas.setFont(TGUIManager.guiFont);
 		canvas.setColor(GUIColor.BUTTON_MAIN.get());
 		canvas.fillRect(0, 0, width, height);
 		canvas.setColor(GUIColor.WHITE.get());
@@ -52,15 +55,12 @@ public class ButtonToggle extends GUIControl
 		canvas.drawLine(width - 1, 1, width - 1, height);
 		canvas.drawLine(1, height - 1, width, height - 1);
 		canvas.setColor(GUIColor.BLACK.get());
-		canvas.drawString(text, width / 2 - (GUIManager.guiFont.getWidth(text) / 2), height / 2 - (GUIManager.guiFont.getHeight(text) / 2));
+		canvas.drawString(text, width / 2 - (TGUIManager.guiFont.getWidth(text) / 2), height / 2 - (TGUIManager.guiFont.getHeight(text) / 2));
 		canvas.flush();
 	}
 
 	public void update(Graphics g)
 	{
-		if (graphic != null)
-			graphic.setAlpha(owningGUI.graphic.getAlpha());
-		
 		if (hasChanged() > -1)
 		{
 			if (selectionChange != null)
@@ -119,17 +119,17 @@ public class ButtonToggle extends GUIControl
 		}
 	}
 	
-	public void onMouseClick(GUIClickedFunction function) // overloadable click (whatever user wants to do with it)
+	public void onMouseClick(TGUIClickedEvent function) // overloadable click (whatever user wants to do with it)
 	{
 		mouseClick = function;
 	}
 	
-	public void onMouseOver(GUIMouseOverFunction function)
+	public void onMouseOver(TGUIMouseOverEvent function)
 	{
 		mouseOver = function;
 	}
 	
-	public void onToggle(GUISelectionFunction function)
+	public void onToggle(TGUISelectionEvent function)
 	{
 		selectionChange = function;
 	}

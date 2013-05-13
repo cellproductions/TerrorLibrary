@@ -1,11 +1,10 @@
-package tl.GUIutil;
+package tl.GUI;
 
 import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
@@ -14,49 +13,53 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Rectangle;
 
-public class TextBox extends GUIControl
+public class TTextBox extends TGUIComponent
 {
-	public static int activeTB = -1;
-	private static void setActiveTB(int i) { TextBox.activeTB = i; };
+	public static final ComponentType type = ComponentType.textBox;
+	public static TTextBox activeTB;
 	
 	private String oldText;
 	private String text;
 	
-	private GUITextFunction textChange;
-	private GUITextFunction enterKey;
-
-	public TextBox()
+	private TGUITextEvent textChange;
+	private TGUITextEvent enterKey;
+	
+	public TTextBox()
 	{
 		super();
-		type = GUIControl.ControlType.textBox;
-		priority = 0;
-		text = oldText = null;
+		if (TTextBox.activeTB == null)
+			TTextBox.activeTB = this;
+	}
+
+	public TTextBox(TGUIComponent parent)
+	{
+		super(parent);
+		if (TTextBox.activeTB == null)
+			TTextBox.activeTB = this;
+		text = oldText = "";
 	}
 	
-	public TextBox(int x, int y, int w, int h) throws SlickException
+	public TTextBox(TGUIComponent parent, float x, float y, int w, int h) throws SlickException
 	{
-		super(x, y, w, h);
-		type = GUIControl.ControlType.textBox;
-		priority = 0;
-		text = "";
-		oldText = "";
-		graphic = new Image(w, h);
+		super(parent, x, y, w, h);
+		if (TTextBox.activeTB == null)
+			TTextBox.activeTB = this;
+		text = oldText = "";
 		changed = true;
 	}
 
-	public TextBox(int x, int y, int w, int h, String def) throws SlickException
+	public TTextBox(TGUIComponent parent, float x, float y, int w, int h, String def) throws SlickException
 	{
-		super(x, y, w, h);
-		type = GUIControl.ControlType.textBox;
-		priority = 0;
-		graphic = new Image(w, h);
+		super(parent, x, y, w, h);
+		if (TTextBox.activeTB == null)
+			TTextBox.activeTB = this;
 		text = oldText = def;
 		changed = true;
 	}
 
 	public boolean isActive()
 	{
-		return enabled && TextBox.activeTB == ID;
+		return enabled && TTextBox.activeTB == this;
 	}
 
 	private String toDraw;
@@ -64,15 +67,17 @@ public class TextBox extends GUIControl
 	@SuppressWarnings("deprecation")
 	private void updateText() throws SlickException
 	{
+		if (graphic == null)
+			graphic = new Image(width, height);
 		canvas = graphic.getGraphics();
 		canvas.clear();
-		canvas.setFont(GUIManager.guiFont);
+		canvas.setFont(TGUIManager.guiFont);
 		canvas.setColor(new Color(0, 0, 0));
 		canvas.draw(new Rectangle(1, 1, width - 1, height - 1));
-		int w = GUIManager.guiFont.getWidth(toDraw + "_");
+		int w = TGUIManager.guiFont.getWidth(toDraw + "_");
 		if (w > width + 16)
 			toDraw = toDraw.substring(0, toDraw.length() - 1);
-		canvas.drawString(toDraw, 3, height / 2 - (GUIManager.guiFont.getHeight(toDraw) / 2) - 2);
+		canvas.drawString(toDraw, 3, height / 2 - (TGUIManager.guiFont.getHeight(toDraw) / 2) - 2);
 		canvas.flush();
 	}
 	
@@ -93,7 +98,7 @@ public class TextBox extends GUIControl
 		}
 		
 		if (isActive())
-			ctrlDown = GUIManager.guiInput.isKeyDown(Input.KEY_LCONTROL) || GUIManager.guiInput.isKeyDown(Input.KEY_RCONTROL);
+			ctrlDown = TGUIManager.guiInput.isKeyDown(Input.KEY_LCONTROL) || TGUIManager.guiInput.isKeyDown(Input.KEY_RCONTROL);
 		
 		if (backspaceDown) // if the backspace key is being held down
 		{
@@ -101,7 +106,7 @@ public class TextBox extends GUIControl
 				time++;
 			else // if timer is complete
 			{
-				if (GUIManager.guiInput.isKeyDown(Input.KEY_BACK))
+				if (TGUIManager.guiInput.isKeyDown(Input.KEY_BACK))
 				{
 					if (!text.isEmpty())
 					{
@@ -124,7 +129,7 @@ public class TextBox extends GUIControl
 			}
 		}
 		
-		toDraw = (TextBox.activeTB == ID ? text + "_" : text);
+		toDraw = (TTextBox.activeTB == this ? text + "_" : text);
 		
 		try
 		{
@@ -151,24 +156,9 @@ public class TextBox extends GUIControl
 			{
 				if (button == 0)
 				{
-					if (TextBox.activeTB > -1) // go through the owningGUI's controls, find the one with the same ID as the activeTB's ID and set it to changed to get rid of its '_'
-					{
-						Iterator<GUI.Control> itr = owningGUI.controls.iterator();
-						GUI.Control ctrl;
-						while (itr.hasNext())
-						{
-							ctrl = itr.next();
-							if (ctrl.guiControl.type == GUIControl.ControlType.textBox)
-							{
-								if (ctrl.guiControl.ID == TextBox.activeTB)
-								{
-									ctrl.guiControl.changed = true;
-									break; // break out of loop
-								}
-							}
-						}
-					}
-					setActiveTB(ID);
+					if (TTextBox.activeTB != null)
+						TTextBox.activeTB.changed = true;
+					TTextBox.activeTB = this;
 					changed = true;
 				}
 			}
@@ -182,7 +172,9 @@ public class TextBox extends GUIControl
 		
 		if (button == 1)
 		{
-			setActiveTB(-1);
+			if (TTextBox.activeTB != null)
+				TTextBox.activeTB.changed = true;
+			TTextBox.activeTB = null;
 			changed = true;
 		}
 	}
@@ -198,7 +190,7 @@ public class TextBox extends GUIControl
 				{
 					if (toDraw.charAt(toDraw.length() - 1) == '_')
 					{
-						int w = GUIManager.guiFont.getWidth(text + Character.toString(c));
+						int w = TGUIManager.guiFont.getWidth(text + Character.toString(c));
 						if (w < width - 4)
 						{
 							oldText = text;
@@ -267,22 +259,22 @@ public class TextBox extends GUIControl
 		}
 	}
 	
-	public void onMouseClick(GUIClickedFunction function)
+	public void onMouseClick(TGUIClickedEvent function)
 	{
 		mouseClick = function;
 	}
 	
-	public void onMouseOver(GUIMouseOverFunction function)
+	public void onMouseOver(TGUIMouseOverEvent function)
 	{
 		mouseOver = function;
 	}
 	
-	public void onTextChange(GUITextFunction function)
+	public void onTextChange(TGUITextEvent function)
 	{
 		textChange = function;
 	}
 	
-	public void onEnterPressed(GUITextFunction function)
+	public void onEnterPressed(TGUITextEvent function)
 	{
 		enterKey = function;
 	}

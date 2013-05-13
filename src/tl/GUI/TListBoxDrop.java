@@ -1,58 +1,60 @@
-package tl.GUIutil;
+package tl.GUI;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Polygon;
 
-import tl.Util.Cursor;
+import tl.GUI.TGUIManager.GUIColor;
+import tl.Util.TCursor;
 
-public class ListBoxDrop extends ListBox
+public class TListBoxDrop extends TListBox
 {
+	public static final ComponentType type = ComponentType.listBoxDrop;
 	protected boolean dropped;
 	protected static final int defH = 30; // box height, h is height of box once dropped
 	protected int normalHeight;
 	
-	protected static final Color defSelected = new Color(168, 168, 168);
+	protected static final Color defSelected = GUIColor.LISTBOX_BACKGROUND.get();
 	protected Color newSelected = null; // colour of selected text chosen by the user (not yet implemented)
 	protected boolean resizeable;
 	
-	public ListBoxDrop()
+	public TListBoxDrop()
 	{
 		super();
-		type = GUIControl.ControlType.listBoxDrop;
-		dropped = false;
+	}
+	
+	public TListBoxDrop(TGUIComponent parent)
+	{
+		super(parent);
 		priority = 1; // higher priority over other types more likely
 	}
 	
-	public ListBoxDrop(int x, int y, int w, int h) throws SlickException
+	public TListBoxDrop(TGUIComponent parent, float x, float y, int w, int h) throws SlickException
 	{
-		super(x, y, w, h);
-		type = GUIControl.ControlType.listBoxDrop;
+		super(parent, x, y, w, h);
 		normalHeight = h;
-		dropped = false;
 		priority = 1;
 	}
 	
-	public ListBoxDrop(int x, int y, int w, int h, int index, Color background) throws SlickException
+	public TListBoxDrop(TGUIComponent parent, float x, float y, int w, int h, int index) throws SlickException
 	{
-		super(x, y, w, h, index);
-		type = GUIControl.ControlType.listBoxDrop;
+		super(parent, x, y, w, h, index);
 		normalHeight = h;
-		this.background = background;
-		dropped = false;
 		priority = 1;
 	}
-
-	public ListBoxDrop(int x, int y, int w, int h, int index, Color background, int priority) throws SlickException
+/*	UN-NEEDED?
+	public ListBoxDrop(GUIComponent parent, int x, int y, int w, int h, int index, Color background, int priority) throws SlickException
 	{
-		super(x, y, w, h, index);
-		type = GUIControl.ControlType.listBoxDrop;
+		super(parent, x, y, w, h, index);
+		type = GUIComponent.ComponentType.listBoxDrop;
 		normalHeight = h;
 		this.background = background;
 		this.priority = priority;
 		dropped = false;
 	}
+	*/
 	
 	public void toggleResizeable() // DO NOT USE, DOES NOT WORK PROPERLY YET
 	{
@@ -67,25 +69,26 @@ public class ListBoxDrop extends ListBox
 	protected void resize()
 	{
 		int size = (int)(defH * numItems - gy);
-		if (size <= GUIManager.screenHeight - 1 && defH * numItems >= defH)
+		if (size <= TGUIManager.screenHeight - 1 && defH * numItems >= defH)
 			height = (defH - 5) * numItems;
 		if (defH * numItems < defH)
 			height = defH;
-		System.out.println(height);
 	}
 	
+	@SuppressWarnings("static-access")
 	private void updateLBD() throws SlickException
 	{
-		Color black = new Color(0, 0, 0);
+		if (graphic == null)
+			graphic = new Image(width, height);
 		canvas = graphic.getGraphics();
 		canvas.clear();
-		canvas.setColor(black);
+		canvas.setColor(GUIColor.BLACK.get());
 		canvas.drawRect(0, 0, width - 1, (dropped ? height : defH) - 1); // draw the box outline/background
-		canvas.setFont(GUIManager.guiFont);
-		if (owningGUI.background != null)
-			background = owningGUI.background;
+		canvas.setFont(TGUIManager.guiFont);
+		if (parent.type == ComponentType.component)
+			background = parent.background;
 		
-		canvas.setColor(background);
+		canvas.setColor(background.get());
 		canvas.fillRect(1, 1, width - 2, (dropped ? height : defH) - 2);
 		
 		int fontHeight = gapHeight - 5;
@@ -99,7 +102,7 @@ public class ListBoxDrop extends ListBox
 					toobig = false;
 					if (numDown + i < numItems)
 					{
-						canvas.setColor(black);
+						canvas.setColor(GUIColor.BLACK.get());
 						if (numDown + i == selected) // draw the black box underneath the text if selected
 						{
 							canvas.fillRect(1, i * (height / (height / fontHeight)) + 3, width - 15, fontHeight + 2);
@@ -117,7 +120,7 @@ public class ListBoxDrop extends ListBox
 	
 			if (toobig) // draw the scroll arrows
 			{
-				canvas.setColor(black);
+				canvas.setColor(GUIColor.BLACK.get());
 				canvas.drawLine(width - 13, height / 2, width - 1, height / 2);
 				canvas.drawLine(width - 14, 1, width - 14, height);
 				Polygon up = new Polygon();
@@ -138,7 +141,7 @@ public class ListBoxDrop extends ListBox
 		{
 			if (numItems > 0)
 			{
-				canvas.setColor(black);
+				canvas.setColor(GUIColor.BLACK.get());
 				canvas.fillRect(1, 3, width - 15, fontHeight + 2);
 				canvas.setColor(newSelected != null ? newSelected : defSelected);
 				canvas.drawString(items.get(selected > -1 && selected < numItems ? selected : 0), 3, 0);
@@ -146,7 +149,7 @@ public class ListBoxDrop extends ListBox
 					selected = 0;
 			}
 			
-			canvas.setColor(black);
+			canvas.setColor(GUIColor.BLACK.get());
 			Polygon down = new Polygon(); // draw the drop down button
 			down.addPoint(width - 12, 11);
 			down.addPoint(width - 2, 11);
@@ -154,7 +157,7 @@ public class ListBoxDrop extends ListBox
 			canvas.draw(down);
 			canvas.fill(down);
 		}
-		if (GUIManager.debug)
+		if (TGUIManager.debug)
 		{
 			canvas.setColor(Color.yellow);
 			canvas.drawRect(0, 0, width - 1, height - 1);
@@ -207,7 +210,7 @@ public class ListBoxDrop extends ListBox
 			{
 				if (enabled && visible)
 				{
-					if (isMouseWithinScroll()) // click outside of drop box to close box
+					if (mouseIsWithinScroll()) // click outside of drop box to close box
 					{
 						if (dropped)
 						{
@@ -263,21 +266,16 @@ public class ListBoxDrop extends ListBox
 		return where;
 	}
 	
-	private boolean isMouseWithinScroll()
+	protected boolean mouseIsWithinScroll()
 	{
-		int x = (int)(Cursor.getX() - gx);
-		int y = (int)(Cursor.getY() - gy);
+		int x = (int)(TCursor.getX() - gx);
+		int y = (int)(TCursor.getY() - gy);
 		return x >= width - 12 && x < width - 2 && y >= 0 && y < (dropped ? height : defH);
 	}
 	
 	public boolean mouseIsOver()
 	{
-		return Cursor.getX() >= gx && Cursor.getX() <= gx + width && Cursor.getY() >= gy && Cursor.getY() <= gy + (dropped ? height : defH) && visible;
-	}
-	
-	public boolean mouseIsOverItem()
-	{
-		return mouseIsOver() && !isMouseWithinScroll();
+		return TCursor.getX() >= gx && TCursor.getX() <= gx + width && TCursor.getY() >= gy && TCursor.getY() <= gy + (dropped ? height : defH) && visible;
 	}
 	
 	public void addItem(String text)

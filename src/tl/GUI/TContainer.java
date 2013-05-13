@@ -1,4 +1,4 @@
-package tl.GUIutil;
+package tl.GUI;
 
 import java.util.ArrayList;
 
@@ -8,10 +8,11 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Polygon;
 
-import tl.Util.Cursor;
+import tl.Util.TCursor;
 
-public class Container<T> extends GUIControl
+public class TContainer<T> extends TGUIComponent implements TIGUICollection
 {
+	public static final ComponentType type = ComponentType.container;
 	private ArrayList<Item> items;
 	private int numItems;
 	private int numDown;
@@ -22,53 +23,35 @@ public class Container<T> extends GUIControl
 	private boolean scaled;
 	private int selected;
 	
-	GUISelectionFunction selectionChange;
-	GUILoopFunction looped;
+	TGUISelectionEvent selectionChange;
+	TGUILoopEvent looped;
 	
-	public Container()
+	public TContainer()
 	{
 		super();
-		priority = 0;
-		type = GUIControl.ControlType.container;
-		numItems = 0;
-		numDown = 0;
-		toobig = false;
-		iWidth = 0;
-		iHeight = 0;
-		gap = 0;
-		scaled = false;
+	}
+	
+	public TContainer(TGUIComponent parent)
+	{
+		super(parent);
 		items = new ArrayList<Item>();
 		selected = -1;
 	}
 	
-	public Container(int x, int y, int w, int h, Color col) throws SlickException
+	public TContainer(TGUIComponent parent, float x, float y, int w, int h) throws SlickException
 	{
-		super(x, y, w, h);
-		priority = 0;
-		type = GUIControl.ControlType.container;
-		//colour = col;
-		graphic = new Image(w, h);
-		numItems = 0;
-		numDown = 0;
-		toobig = false;
+		super(parent, x, y, w, h);
 		items = new ArrayList<Item>();
 		iWidth = 30;
 		iHeight = 30;
 		gap = 20;
-		scaled = false;
 		selected = -1;
 		changed = true;
 	}
 	
-	public Container(int x, int y, int w, int h, int iw, int ih, int gap) throws SlickException
+	public TContainer(TGUIComponent parent, float x, float y, int w, int h, int iw, int ih, int gap) throws SlickException
 	{
-		super(x, y, w, h);
-		priority = 0;
-		type = GUIControl.ControlType.container;
-		graphic = new Image(w, h);
-		numItems = 0;
-		numDown = 0;
-		toobig = false;
+		super(parent, x, y, w, h);
 		items = new ArrayList<Item>();
 		iWidth = iw;
 		iHeight = ih;
@@ -80,6 +63,8 @@ public class Container<T> extends GUIControl
 	
 	private void updateC() throws SlickException
 	{
+		if (graphic == null)
+			graphic = new Image(width, height);
 		canvas = graphic.getGraphics();
 		canvas.clear();
 		canvas.setColor(new Color(0, 0, 0));
@@ -158,8 +143,8 @@ public class Container<T> extends GUIControl
 	{
 		if (mouseButtonDown(0))
 		{
-			float y = Cursor.getY() - gy;
-			float x = Cursor.getX() - gx;
+			float y = TCursor.getY() - gy;
+			float x = TCursor.getX() - gx;
 
 			if (toobig)
 			{
@@ -222,22 +207,22 @@ public class Container<T> extends GUIControl
 			g.drawImage(graphic, gx, gy);
 	}
 	
-	public void onMouseClick(GUIClickedFunction function)
+	public void onMouseClick(TGUIClickedEvent function)
 	{
 		mouseClick = function;
 	}
 	
-	public void onMouseOver(GUIMouseOverFunction function)
+	public void onMouseOver(TGUIMouseOverEvent function)
 	{
 		mouseOver = function;
 	}
 	
-	public void onSelectionChange(GUISelectionFunction function)
+	public void onSelectionChange(TGUISelectionEvent function)
 	{
 		selectionChange = function;
 	}
 	
-	public void onLoop(GUILoopFunction function)
+	public void onLoop(TGUILoopEvent function)
 	{
 		looped = function;
 	}
@@ -393,5 +378,31 @@ public class Container<T> extends GUIControl
 		items.clear();
 		numItems = 0;
 		changed = true;
+	}
+
+	@Override
+	public void scrollUp()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void scrollDown()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void sort(TSortDirection direction)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	public int getSize()
+	{
+		return items.size();
 	}
 }

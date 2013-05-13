@@ -1,15 +1,16 @@
-package tl.GUIutil;
+package tl.GUI;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.geom.Rectangle;
 
-import tl.Util.Cursor;
+import tl.GUI.TGUIManager.GUIColor;
+import tl.Util.TCursor;
 
-public class Slider extends GUIControl
+public class TSlider extends TGUIComponent
 {
+	public static final ComponentType type = ComponentType.slider;
 	private long max;
 	private long min;
 	private long value;
@@ -17,78 +18,77 @@ public class Slider extends GUIControl
 	private Image slide;
 	private boolean pressing; // whether or not the user is holding down the mouse button while moving the slider
 	
-	private GUIValueFunction valueChange;
-	private GUIValueFunction valueFinal;
-
-	public Slider()
+	private TGUIValueEvent valueChange;
+	private TGUIValueEvent valueFinal;
+	
+	public TSlider()
 	{
 		super();
-		type = GUIControl.ControlType.slider;
-		max = 0;
-		min = 0;
-		value = 0;
-		box = null;
-		slide = null;
-		pressing = false;
 	}
 
-	public Slider(int x, int y, int w, int h, int ma, int mi, int v) throws SlickException
+	public TSlider(TGUIComponent parent)
 	{
-		super(x, y, w, h);
-		type = GUIControl.ControlType.slider;
+		super(parent);
+	}
+
+	public TSlider(TGUIComponent parent, float x, float y, int w, int h, int ma, int mi, int v) throws SlickException
+	{
+		super(parent, x, y, w, h);
 		max = ma;
 		min = mi;
 		value = v;
-		pressing = false;
-		
-		int xOffSet = 2;
-
-		box = new Image(w, h); // this goes here, only ever need to redraw the slide part
-		canvas = box.getGraphics();
-		canvas.setColor(new Color(0, 0, 0));
-		canvas.fill(new Rectangle(0, 0, w - 1, h));
-		canvas.setColor(new Color(70, 70, 70));
-		canvas.drawLine(0, 0, w - 1, 0);
-		canvas.drawLine(0, 0, 0, h - 1);
-		canvas.setColor(new Color(255, 255, 255));
-		canvas.drawLine(w - 1, 1, w - 1, h - 1);
-		canvas.drawLine(1, h - 1, w - 1, h - 1);
-		canvas.flush();
-		
-		w = 9;
-		h += 12;
-		slide = new Image(w, h);
-		canvas = slide.getGraphics();
-		canvas.setColor(new Color(160, 160, 160));
-		canvas.fill(new Rectangle(0, 0, w - 1, h - 1));
-		canvas.setColor(new Color(255, 255, 255));
-		canvas.drawLine(0, 0, w - 1, 0);
-		canvas.drawLine(0, 0, 0, h - 1);
-		canvas.setColor(new Color(70, 70, 70));
-		canvas.drawLine(w - 2, 1, w - 2, h - 1);
-		canvas.drawLine(1, h - 2, w - 1, h - 2);
-		canvas.flush();
-		
-		float fWidth = width - xOffSet * 2, fMax = max, fValue = value, fMin = min;
-		graphic = new Image(width + xOffSet * 2, h);
-		canvas = graphic.getGraphics();
-		canvas.drawImage(box, xOffSet, h / 2 - (box.getHeight() / 2));
-		valuex = (fWidth * (fValue - fMin)) / (fMax - fMin); // thanks wolframalpha
-		canvas.drawImage(slide, valuex, 0); 
-		canvas.flush();
-		
 		changed = true;
 	}
 
 	public boolean mouseIsOver()
 	{
-		return Cursor.getX() >= gx + 4 && Cursor.getX() <= gx + width && Cursor.getY() >= gy && Cursor.getY() <= gy + height;
+		return TCursor.getX() >= gx + 4 && TCursor.getX() <= gx + width && TCursor.getY() >= gy && TCursor.getY() <= gy + height;
 	}
 	
 	private float valuex;
 
 	private void updateSlider() throws SlickException
 	{
+		if (graphic == null)
+		{
+			int xOffSet = 2;
+			int w = width;
+			int h = height;
+			box = new Image(w, h);
+			canvas = box.getGraphics();
+			canvas.setColor(GUIColor.BLACK.get());
+			canvas.fillRect(0, 0, w - 1, h);
+			canvas.setColor(GUIColor.BUTTON_BORDER.get());
+			canvas.drawLine(0, 0, w - 1, 0);
+			canvas.drawLine(0, 0, 0, h - 1);
+			canvas.setColor(GUIColor.WHITE.get());
+			canvas.drawLine(w - 1, 1, w - 1, h - 1);
+			canvas.drawLine(1, h - 1, w - 1, h - 1);
+			canvas.flush();
+			
+			w = 9;
+			h += 12;
+			slide = new Image(w, h);
+			canvas = slide.getGraphics();
+			canvas.setColor(GUIColor.BUTTON_MAIN.get());
+			canvas.fillRect(0, 0, w - 1, h - 1);
+			canvas.setColor(GUIColor.WHITE.get());
+			canvas.drawLine(0, 0, w - 1, 0);
+			canvas.drawLine(0, 0, 0, h - 1);
+			canvas.setColor(GUIColor.BUTTON_BORDER.get());
+			canvas.drawLine(w - 2, 1, w - 2, h - 1);
+			canvas.drawLine(1, h - 2, w - 1, h - 2);
+			canvas.flush();
+			
+			float fWidth = width - xOffSet * 2, fMax = max, fValue = value, fMin = min;
+			graphic = new Image(width + xOffSet * 2, h);
+			canvas = graphic.getGraphics();
+			canvas.drawImage(box, xOffSet, h / 2 - (box.getHeight() / 2));
+			valuex = (fWidth * (fValue - fMin)) / (fMax - fMin); // thanks wolframalpha
+			canvas.drawImage(slide, valuex, 0); 
+			canvas.flush();
+		}
+		
 		float pos = valuex - slide.getWidth() / 2;
 		canvas = graphic.getGraphics();
 		canvas.clear();
@@ -98,7 +98,7 @@ public class Slider extends GUIControl
 		else if (pos >= box.getWidth() + 2) // these checks keep the slider within the bounds of its box
 			pos = box.getWidth() + 2;
 		canvas.drawImage(slide, pos, 0);
-		if (GUIManager.debug)
+		if (TGUIManager.debug)
 		{
 			canvas.setColor(Color.yellow);
 			canvas.drawRect(0, 0, width - 1, height - 1);
@@ -119,7 +119,7 @@ public class Slider extends GUIControl
 		
 		if (pressing)
 		{
-			valuex = Cursor.getX() - gx;
+			valuex = TCursor.getX() - gx;
 			int offset = (valuex <= width / 2 ? slide.getWidth() / 2 : 0);
 			valuex -= offset;
 			long check = Math.round((valuex * (max - min)) / width) + min;
@@ -176,7 +176,7 @@ public class Slider extends GUIControl
 				if (pressing)
 				{
 					pressing = false;
-					valuex = Cursor.getX() - gx;
+					valuex = TCursor.getX() - gx;
 					int offset = (valuex <= width / 2 ? slide.getWidth() / 2 : 0);
 					valuex -= offset;
 					long check = Math.round((valuex * (max - min)) / width) + min;
@@ -197,22 +197,22 @@ public class Slider extends GUIControl
 		}
 	}
 	
-	public void onMouseClick(GUIClickedFunction function)
+	public void onMouseClick(TGUIClickedEvent function)
 	{
 		mouseClick = function;
 	}
 	
-	public void onMouseOver(GUIMouseOverFunction function)
+	public void onMouseOver(TGUIMouseOverEvent function)
 	{
 		mouseOver = function;
 	}
 	
-	public void onValueChange(GUIValueFunction function)
+	public void onValueChange(TGUIValueEvent function)
 	{
 		valueChange = function;
 	}
 	
-	public void onMouseReleased(GUIValueFunction function)
+	public void onMouseReleased(TGUIValueEvent function)
 	{
 		valueFinal = function;
 	}

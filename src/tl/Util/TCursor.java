@@ -4,7 +4,7 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 
-public class Cursor extends Object
+public class TCursor extends Object
 {
 	public static Image graphic;
 	public static Input mouseInput;

@@ -2,27 +2,29 @@ TODO:
 
 ButtonToggle:
 * set 'index' to protected, remove oldIndex, make sure setIndex() throws an exception
+* remove obselete hasChanged() and oldIndex and replace with setIndex()
 
 
 Container:
-* Container needs all mouse input controls added
+* Container needs all mouse input components added
 * fix widths to account for scroll bar (or horizontal scrolling?)
 * Make a ContainerGen class that inherits Container, Container stores images, ContainerGen stores images and generic objects
+* fill out scroll functions
 
 
 Label:
-* Label needs all mouse input controls added
+* Label needs all mouse input components added
 * Labels could do auto line wrapping
 * Labels could also centre the text (centreText function)
 * should draw text starting from x=0, y=0
 
 
 LabelExtended:
-* LabelExtended needs all mouse input controls added
+* LabelExtended needs all mouse input components added
 
 
 Slider:
-* Slider needs all mouse input controls added
+* Slider needs all mouse input components added
 * update Slider so that it uses the 'changed' variable
 
 
@@ -30,16 +32,23 @@ ListBox:
 * ListBox's need to fix the length of text if it goes outside the width of the list box
 
 
+ListBoxGen:
+* should be its own superclass (shouldnt inherit from ListBox)
+	* as a result, ListBoxDropGen should inherit from this component
+
+
 ListBoxDrop:
 * Click anywhere on a closed ListBoxDrop to open it
+* keep the arrow draw upon dropping, allow clicking on it to close again
 
 
 TextBox:
 * text box's should allow typing sentences outside of the box area, also left + right buttons should move a 'positioner' of sorts to let you type anywhere
+* if there is enough vertical space, allow multiple lines of text to be typed
 
 
-GUIControls:
-* all input first needs to check if the control is enabled (direct input, meaning mouse click or key press)
+GUIComponents:
+* all input first needs to check if the component is enabled (direct input, meaning mouse click or key press)
 * set change variables where appropriate
 * upon being de-enabled, GUIControls should draw grey, transparent filter over their graphics
 * every GUIControl needs alpha variable (upon being changed, set changed to true and set all appropriate Images to that alpha)
@@ -51,17 +60,21 @@ GUIControls:
 * should draw outside of the size of the owningGUI
 * remove the GUILoop function, its is basically the same as the game loop, not needed
 * use GUIColor colours
+* all components that implement scrollable, change mouseButtonDown(0) part to mousePressed(), set a boolean to false upon mouseReleased() to stop scrolling 
+* all components must check for enabled
+* make updateC() protected and all inherited classes use it instead of their own
 
 
 GUI:
-* GUI needs enabled variable
-* add Exception classes
+* delete? obsolete?
 
 
 * Cursor needs to have a setPointerPosition(int x, int y) that sets, on its image, a spot where it gets its x and y positions from
 * implement debugging for all GUI/GUIControls (draws a yellow rectangle around them, 0, 0, width - 1, height - 1)
 * check exception handling throughout gui stuff
 * make sure that all GUI and GUIControls can handle using an image
+* create HorizontalView and VerticalView classes that auto space, stretch, and position GUIControls
+* create Interfaces that describe different functions for GUIComponents
 
 
 BUGS:
