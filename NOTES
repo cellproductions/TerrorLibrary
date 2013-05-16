@@ -45,6 +45,7 @@ ListBoxDrop:
 TextBox:
 * text box's should allow typing sentences outside of the box area, also left + right buttons should move a 'positioner' of sorts to let you type anywhere
 * if there is enough vertical space, allow multiple lines of text to be typed
+* upon tab key being pressed, set next textbox in set (from parent) to the active one (or in the next set if there are no more textbox's in the current set)
 
 
 GUIComponents:
@@ -63,6 +64,7 @@ GUIComponents:
 * all components that implement scrollable, change mouseButtonDown(0) part to mousePressed(), set a boolean to false upon mouseReleased() to stop scrolling 
 * all components must check for enabled
 * make updateC() protected and all inherited classes use it instead of their own
+* remove 'priority' method from all base/subclasses
 
 
 GUI:
@@ -79,5 +81,6 @@ GUI:
 
 BUGS:
 * sliders dont set the slider at the right position from the constructor
-* clicking on an Item in a ListBox gets gradually more offset for some reason
+* sliders dont 'slide' anymore, they must slide :P
+* clicking on an Item in a ListBox gets gradually more offset for some reason (same in other collection implemented subclasses)
 * ListBox numDown is 1 off when using scrollDown/Up compared to normal click scrolling (perhaps make click scroll use scrollDown/Up functions)

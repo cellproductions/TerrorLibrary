@@ -8,8 +8,6 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Polygon;
 
-import tl.GUI.TGUIManager.GUIColor;
-
 public class TListBoxGen<T> extends TListBox
 {
 	public static final ComponentType type = ComponentType.listBoxGen;
@@ -37,7 +35,7 @@ public class TListBoxGen<T> extends TListBox
 	{
 		canvas = graphic.getGraphics();
 		canvas.clear();
-		canvas.setColor(GUIColor.BLACK.get());
+		canvas.setColor(TGUIManager.BLACK);
 		canvas.drawRect(0, 0, width - 1, height - 1);
 		canvas.setFont(TGUIManager.guiFont);
 		if (parent.type == ComponentType.component)
@@ -52,11 +50,11 @@ public class TListBoxGen<T> extends TListBox
 				toobig = false;
 				if (numDown + i < numItems)
 				{
-					canvas.setColor(GUIColor.BLACK.get());
+					canvas.setColor(TGUIManager.BLACK);
 					if (numDown + i == selected) // draw the black box underneath the text if selected
 					{
 						canvas.fillRect(1, i * (height / (height / fontHeight)) + 3, width - 15, fontHeight + 2);
-						canvas.setColor(background != null ? background.get() : GUIColor.LISTBOX_BACKGROUND.get());
+						canvas.setColor(background != null ? background : TGUIManager.LISTBOX_BACKGROUND);
 					}
 					canvas.drawString(items.get(i + numDown).text, 3, i * (height / (height / fontHeight)));
 				}
@@ -70,7 +68,7 @@ public class TListBoxGen<T> extends TListBox
 
 		if (toobig)
 		{
-			canvas.setColor(GUIColor.BLACK.get());
+			canvas.setColor(TGUIManager.BLACK);
 			canvas.drawLine(width - 13, height / 2, width - 1, height / 2);
 			canvas.drawLine(width - 14, 1, width - 14, height);
 			Polygon up = new Polygon();

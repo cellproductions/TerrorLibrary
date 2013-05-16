@@ -2,13 +2,20 @@ package tl.GUI;
 
 import java.util.ArrayList;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
-import tl.GUI.TGUIManager.GUIColor;
 import tl.Util.TCursor;
 
+/**
+ * TGUIComponent is the base class from which all other TGUIComponents derive from.<br>
+ * The TGUIComponent can be inherited to create almost any other user defined TGUI.
+ * 
+ * @author Callum Nichols
+ * @since 2.0
+ */
 public class TGUIComponent implements TGUIInterface, Comparable<TGUIComponent>
 {
 	protected Image graphic;
@@ -16,29 +23,101 @@ public class TGUIComponent implements TGUIInterface, Comparable<TGUIComponent>
 	protected TGUIComponent parent;
 	protected ArrayList<TGUIComponent> children;
 	protected int compcounter;
-	protected int priority = 0; // controls are drawn from lowest priority to highest
+	protected int priority = 0; // controls are drawn from lowest priority to highest [OBSOLETE?]
 	protected boolean changed = false;
-	public final GUIColor background = GUIColor.GUI_MAIN;
-	public final GUIColor border = GUIColor.GUI_BORDER;
+	public final Color background = TGUIManager.GUI_MAIN;
+	public final Color border = TGUIManager.GUI_BORDER;
 	protected float alpha = 1f; // only for the constructor
 	protected boolean setalpha;
 	
 	/* PROPERTIES_START */
+	/**
+	 * TGUIComponent ID relative to its parent (relative to the TGUIManager if parent is null).
+	 * @see #getID()
+	 */
 	protected int ID;
-	protected float x; // where on the gui the position of this control is
+	/**
+	 * The x position on the parent component (position on the screen if parent is null).
+	 * @see #getX()
+	 * @see #setPosition(float, float)
+	 */
+	protected float x;
+	/**
+	 * The y position on the parent component (position on the screen if parent is null).
+	 * @see #getY()
+	 * @see #setPosition(float, float)
+	 */
 	protected float y;
-	protected float gx; // where on the screen the position of this control is
+	/**
+	 * The x position on the main window.
+	 * @see #getScreenX()
+	 */
+	protected float gx;
+	/**
+	 * The y position on the main window.
+	 * @see #getScreenY()
+	 */
 	protected float gy;
+	/**
+	 * Width of the component.
+	 * @see #width()
+	 */
 	protected int width;
+	/**
+	 * Height of the component.
+	 * @see #height()
+	 */
 	protected int height;
+	/**
+	 * Whether or not the component is visible to the user (true if visible).
+	 * @see #getVisibility()
+	 * @see #setVisible(boolean)
+	 */
 	protected boolean visible;
+	/**
+	 * Whether or not the component is enabled for use (true if enabled).
+	 * @see #getEnabled()
+	 * @see #setEnabled(boolean)
+	 */
 	protected boolean enabled;
+	/**
+	 * A type that represents what kind of component the TGUIComponent is.
+	 * @see ComponentType
+	 */
 	public static final ComponentType type = ComponentType.component;
 	/* PROPERTIES_END */
 
+	/**
+	 * An interface instance that is used to run a function upon detecting a mouse click on a TGUIComponent.
+	 * @see TGUIClickedEvent
+	 * @see #onMouseClick(TGUIClickedEvent)
+	 */
 	protected TGUIClickedEvent mouseClick;
+	/**
+	 * An interface instance that is used to run a function upon detecting a cursor positioned over a TGUIComponent.
+	 * @see TGUIMouseOverEvent
+	 * @see #onMouseOver(TGUIMouseOverEvent)
+	 */
 	protected TGUIMouseOverEvent mouseOver;
 
+	/**
+	 * ComponentType represents a type of TGUIComponent for easy comparison and removal of ambiguity.<br>
+	 * E.g.<br><br>
+	 * <pre>
+	 * {@code
+	 * void checkComponent(TGUIComponent comp)
+	 * {
+	 * 	// if comp is a TGUIComponent (and not a TButton or any other type of component)
+	 * 	if (comp.type == TGUIComponent.type)
+	 * 		// do something
+	 * }
+	 * TButton button = new TButton();
+	 * checkComponent(button);
+	 * }
+	 * </pre>
+	 * @author Callum Nichols
+	 * @since 1.5
+	 */
 	public static enum ComponentType
 	{
 		component, button, buttonToggle, container, label, labelExtended, listBox, listBoxGen, listBoxDrop, listBoxDropGen, slider, textBox
@@ -121,9 +200,9 @@ public class TGUIComponent implements TGUIInterface, Comparable<TGUIComponent>
 		if (setalpha)
 			graphic.setAlpha(alpha);
 		canvas = graphic.getGraphics();
-		canvas.setColor(background.get());
+		canvas.setColor(background);
 		canvas.fillRect(0, 0, width - 1, height - 1);
-		canvas.setColor(border.get());
+		canvas.setColor(border);
 		canvas.drawRect(0, 0, width - 1, height - 1);
 		canvas.flush();
 	}

@@ -13,27 +13,6 @@ public class TGUIManager
 	public static int numGUIs;
 	public static Input guiInput;
 	public static boolean debug;
-	public static enum GUIColor
-	{
-		COMPONENT_GREYED(128, 128, 128, .8f), GUI_MAIN(192, 192, 192), GUI_BORDER(128, 128, 128), BUTTON_MAIN(160, 160, 160), BUTTON_BORDER(70, 70, 70), 
-		LISTBOX_BACKGROUND(168, 168, 168), WHITE(255, 255, 255), BLACK(0, 0, 0);
-		
-		Color col;
-		GUIColor(int r, int g, int b)
-		{
-			col = new Color(r, g, b);
-		}
-		
-		GUIColor(int r, int g, int b, float a)
-		{
-			col = new Color(r, g, b, a);
-		}
-		
-		public Color get()
-		{
-			return col;
-		}
-	};
 
 	public static void init(Input input, int width, int height, TrueTypeFont font)
 	{
@@ -42,4 +21,13 @@ public class TGUIManager
 		screenHeight = height;
 		guiFont = font;
 	}
+	
+	public static Color COMPONENT_GREYED = new Color(128, 128, 128, .8f);
+	public static Color GUI_MAIN = new Color(192, 192, 192);
+	public static Color GUI_BORDER = new Color(128, 128, 128);
+	public static Color BUTTON_MAIN = new Color(160, 160, 160);
+	public static Color BUTTON_BORDER = new Color(70, 70, 70);
+	public static Color LISTBOX_BACKGROUND = new Color(168, 168, 168);
+	public static Color WHITE = new Color(255, 255, 255);
+	public static Color BLACK = new Color(0, 0, 0);
 }

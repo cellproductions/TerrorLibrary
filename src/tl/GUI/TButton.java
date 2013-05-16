@@ -4,8 +4,6 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
-import tl.GUI.TGUIManager.GUIColor;
-
 public class TButton extends TGUIComponent
 {
 	public static final ComponentType type = ComponentType.button;
@@ -87,15 +85,15 @@ public class TButton extends TGUIComponent
 		canvas = normal.getGraphics();
 		canvas.clear();
 		canvas.setFont(TGUIManager.guiFont);
-		canvas.setColor(GUIColor.BUTTON_MAIN.get());
+		canvas.setColor(TGUIManager.BUTTON_MAIN);
 		canvas.fillRect(0, 0, width, height);
-		canvas.setColor(GUIColor.WHITE.get());
+		canvas.setColor(TGUIManager.WHITE);
 		canvas.drawLine(0, 0, width, 0);
 		canvas.drawLine(0, 0, 0, height);
-		canvas.setColor(GUIColor.BUTTON_BORDER.get());
+		canvas.setColor(TGUIManager.BUTTON_BORDER);
 		canvas.drawLine(width - 1, 1, width - 1, height);
 		canvas.drawLine(1, height - 1, width, height - 1);
-		canvas.setColor(GUIColor.BLACK.get());
+		canvas.setColor(TGUIManager.BLACK);
 		canvas.drawString(text, width / 2 - (TGUIManager.guiFont.getWidth(text) / 2), height / 2 - (TGUIManager.guiFont.getHeight(text) / 2));
 		canvas.flush();
 
@@ -104,15 +102,15 @@ public class TButton extends TGUIComponent
 		canvas = pushed.getGraphics();
 		canvas.clear();
 		canvas.setFont(TGUIManager.guiFont);
-		canvas.setColor(GUIColor.BUTTON_MAIN.get());
+		canvas.setColor(TGUIManager.BUTTON_MAIN);
 		canvas.fillRect(0, 0, width, height);
-		canvas.setColor(GUIColor.BUTTON_BORDER.get());
+		canvas.setColor(TGUIManager.BUTTON_BORDER);
 		canvas.drawLine(0, 0, width, 0);
 		canvas.drawLine(0, 0, 0, height);
-		canvas.setColor(GUIColor.WHITE.get());
+		canvas.setColor(TGUIManager.WHITE);
 		canvas.drawLine(width - 1, 1, width - 1, height);
 		canvas.drawLine(1, height - 1, width, height - 1);
-		canvas.setColor(GUIColor.BLACK.get());
+		canvas.setColor(TGUIManager.BLACK);
 		canvas.drawString(text, width / 2 - (TGUIManager.guiFont.getWidth(text) / 2) - 1, height / 2 - (TGUIManager.guiFont.getHeight(text) / 2) - 1);
 		canvas.flush();
 	}

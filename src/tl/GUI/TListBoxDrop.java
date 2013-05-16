@@ -6,17 +6,16 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Polygon;
 
-import tl.GUI.TGUIManager.GUIColor;
 import tl.Util.TCursor;
 
 public class TListBoxDrop extends TListBox
 {
 	public static final ComponentType type = ComponentType.listBoxDrop;
 	protected boolean dropped;
-	protected static final int defH = 30; // box height, h is height of box once dropped
+	protected int defH = 30; // box height, h is height of box once dropped
 	protected int normalHeight;
 	
-	protected static final Color defSelected = GUIColor.LISTBOX_BACKGROUND.get();
+	protected static final Color defSelected = TGUIManager.LISTBOX_BACKGROUND;
 	protected Color newSelected = null; // colour of selected text chosen by the user (not yet implemented)
 	protected boolean resizeable;
 	
@@ -35,6 +34,8 @@ public class TListBoxDrop extends TListBox
 	{
 		super(parent, x, y, w, h);
 		normalHeight = h;
+		if (normalHeight < defH)
+			defH = normalHeight;
 		priority = 1;
 	}
 	
@@ -42,6 +43,8 @@ public class TListBoxDrop extends TListBox
 	{
 		super(parent, x, y, w, h, index);
 		normalHeight = h;
+		if (normalHeight < defH)
+			defH = normalHeight;
 		priority = 1;
 	}
 /*	UN-NEEDED?
@@ -82,13 +85,13 @@ public class TListBoxDrop extends TListBox
 			graphic = new Image(width, height);
 		canvas = graphic.getGraphics();
 		canvas.clear();
-		canvas.setColor(GUIColor.BLACK.get());
+		canvas.setColor(TGUIManager.BLACK);
 		canvas.drawRect(0, 0, width - 1, (dropped ? height : defH) - 1); // draw the box outline/background
 		canvas.setFont(TGUIManager.guiFont);
 		if (parent.type == ComponentType.component)
 			background = parent.background;
 		
-		canvas.setColor(background.get());
+		canvas.setColor(background);
 		canvas.fillRect(1, 1, width - 2, (dropped ? height : defH) - 2);
 		
 		int fontHeight = gapHeight - 5;
@@ -102,7 +105,7 @@ public class TListBoxDrop extends TListBox
 					toobig = false;
 					if (numDown + i < numItems)
 					{
-						canvas.setColor(GUIColor.BLACK.get());
+						canvas.setColor(TGUIManager.BLACK);
 						if (numDown + i == selected) // draw the black box underneath the text if selected
 						{
 							canvas.fillRect(1, i * (height / (height / fontHeight)) + 3, width - 15, fontHeight + 2);
@@ -120,7 +123,7 @@ public class TListBoxDrop extends TListBox
 	
 			if (toobig) // draw the scroll arrows
 			{
-				canvas.setColor(GUIColor.BLACK.get());
+				canvas.setColor(TGUIManager.BLACK);
 				canvas.drawLine(width - 13, height / 2, width - 1, height / 2);
 				canvas.drawLine(width - 14, 1, width - 14, height);
 				Polygon up = new Polygon();
@@ -141,7 +144,7 @@ public class TListBoxDrop extends TListBox
 		{
 			if (numItems > 0)
 			{
-				canvas.setColor(GUIColor.BLACK.get());
+				canvas.setColor(TGUIManager.BLACK);
 				canvas.fillRect(1, 3, width - 15, fontHeight + 2);
 				canvas.setColor(newSelected != null ? newSelected : defSelected);
 				canvas.drawString(items.get(selected > -1 && selected < numItems ? selected : 0), 3, 0);
@@ -149,7 +152,7 @@ public class TListBoxDrop extends TListBox
 					selected = 0;
 			}
 			
-			canvas.setColor(GUIColor.BLACK.get());
+			canvas.setColor(TGUIManager.BLACK);
 			Polygon down = new Polygon(); // draw the drop down button
 			down.addPoint(width - 12, 11);
 			down.addPoint(width - 2, 11);

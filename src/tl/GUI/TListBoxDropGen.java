@@ -9,8 +9,6 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Polygon;
 
-import tl.GUI.TGUIManager.GUIColor;
-
 public class TListBoxDropGen<T> extends TListBoxDrop
 {
 	public static final ComponentType type = ComponentType.listBoxDropGen;
@@ -44,13 +42,13 @@ public class TListBoxDropGen<T> extends TListBoxDrop
 	{
 		canvas = graphic.getGraphics();
 		canvas.clear();
-		canvas.setColor(GUIColor.BLACK.get());
+		canvas.setColor(TGUIManager.BLACK);
 		canvas.drawRect(0, 0, width - 1, (dropped ? height : defH) - 1); // draw the box outline/background
 		canvas.setFont(TGUIManager.guiFont);
 		if (parent.type == ComponentType.component)
 			background = parent.background;
 		
-		canvas.setColor(background.get());
+		canvas.setColor(background);
 		canvas.fillRect(1, 1, width - 2, (dropped ? height : defH) - 2);
 		
 		int fontHeight = gapHeight - 5;
@@ -64,7 +62,7 @@ public class TListBoxDropGen<T> extends TListBoxDrop
 					toobig = false;
 					if (numDown + i < numItems)
 					{
-						canvas.setColor(GUIColor.BLACK.get());
+						canvas.setColor(TGUIManager.BLACK);
 						if (numDown + i == selected) // draw the black box underneath the text if selected
 						{
 							canvas.fillRect(1, i * (height / (height / fontHeight)) + 3, width - 15, fontHeight + 2);
@@ -82,7 +80,7 @@ public class TListBoxDropGen<T> extends TListBoxDrop
 	
 			if (toobig) // draw the scroll arrows
 			{
-				canvas.setColor(GUIColor.BLACK.get());
+				canvas.setColor(TGUIManager.BLACK);
 				canvas.drawLine(width - 13, height / 2, width - 1, height / 2);
 				canvas.drawLine(width - 14, 1, width - 14, height);
 				Polygon up = new Polygon();
@@ -103,7 +101,7 @@ public class TListBoxDropGen<T> extends TListBoxDrop
 		{
 			if (numItems > 0)
 			{
-				canvas.setColor(GUIColor.BLACK.get());
+				canvas.setColor(TGUIManager.BLACK);
 				canvas.fillRect(1, 3, width - 15, fontHeight + 2);
 				canvas.setColor(newSelected != null ? newSelected : defSelected);
 				canvas.drawString(items.get(selected > -1 && selected < numItems ? selected : 0).text, 3, 0);
@@ -111,7 +109,7 @@ public class TListBoxDropGen<T> extends TListBoxDrop
 					selected = 0;
 			}
 			
-			canvas.setColor(GUIColor.BLACK.get());
+			canvas.setColor(TGUIManager.BLACK);
 			Polygon down = new Polygon(); // draw the drop down button
 			down.addPoint(width - 12, 11);
 			down.addPoint(width - 2, 11);

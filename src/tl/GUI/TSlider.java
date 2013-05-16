@@ -5,7 +5,6 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
-import tl.GUI.TGUIManager.GUIColor;
 import tl.Util.TCursor;
 
 public class TSlider extends TGUIComponent
@@ -56,12 +55,12 @@ public class TSlider extends TGUIComponent
 			int h = height;
 			box = new Image(w, h);
 			canvas = box.getGraphics();
-			canvas.setColor(GUIColor.BLACK.get());
+			canvas.setColor(TGUIManager.BLACK);
 			canvas.fillRect(0, 0, w - 1, h);
-			canvas.setColor(GUIColor.BUTTON_BORDER.get());
+			canvas.setColor(TGUIManager.BUTTON_BORDER);
 			canvas.drawLine(0, 0, w - 1, 0);
 			canvas.drawLine(0, 0, 0, h - 1);
-			canvas.setColor(GUIColor.WHITE.get());
+			canvas.setColor(TGUIManager.WHITE);
 			canvas.drawLine(w - 1, 1, w - 1, h - 1);
 			canvas.drawLine(1, h - 1, w - 1, h - 1);
 			canvas.flush();
@@ -70,12 +69,12 @@ public class TSlider extends TGUIComponent
 			h += 12;
 			slide = new Image(w, h);
 			canvas = slide.getGraphics();
-			canvas.setColor(GUIColor.BUTTON_MAIN.get());
+			canvas.setColor(TGUIManager.BUTTON_MAIN);
 			canvas.fillRect(0, 0, w - 1, h - 1);
-			canvas.setColor(GUIColor.WHITE.get());
+			canvas.setColor(TGUIManager.WHITE);
 			canvas.drawLine(0, 0, w - 1, 0);
 			canvas.drawLine(0, 0, 0, h - 1);
-			canvas.setColor(GUIColor.BUTTON_BORDER.get());
+			canvas.setColor(TGUIManager.BUTTON_BORDER);
 			canvas.drawLine(w - 2, 1, w - 2, h - 1);
 			canvas.drawLine(1, h - 2, w - 1, h - 2);
 			canvas.flush();

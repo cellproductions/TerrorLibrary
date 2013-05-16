@@ -98,24 +98,26 @@ public class TTextBox extends TGUIComponent
 		}
 		
 		if (isActive())
+		{
 			ctrlDown = TGUIManager.guiInput.isKeyDown(Input.KEY_LCONTROL) || TGUIManager.guiInput.isKeyDown(Input.KEY_RCONTROL);
 		
-		if (backspaceDown) // if the backspace key is being held down
-		{
-			if (time < frames) 
-				time++;
-			else // if timer is complete
+			if (backspaceDown) // if the backspace key is being held down
 			{
-				if (TGUIManager.guiInput.isKeyDown(Input.KEY_BACK))
+				if (time < frames) 
+					time++;
+				else // if timer is complete
 				{
-					if (!text.isEmpty())
+					if (TGUIManager.guiInput.isKeyDown(Input.KEY_BACK))
 					{
-						oldText = text;
-						text = text.substring(0, text.length() - 1);
-						changed = true;
+						if (!text.isEmpty())
+						{
+							oldText = text;
+							text = text.substring(0, text.length() - 1);
+							changed = true;
+						}
 					}
+					time = 0;
 				}
-				time = 0;
 			}
 		}
 		
