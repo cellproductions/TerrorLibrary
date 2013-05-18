@@ -10,7 +10,6 @@ import tl.Util.TCursor;
 
 public class TListBoxDrop extends TListBox
 {
-	public static final ComponentType type = ComponentType.listBoxDrop;
 	protected boolean dropped;
 	protected int defH = 30; // box height, h is height of box once dropped
 	protected int normalHeight;
@@ -22,17 +21,20 @@ public class TListBoxDrop extends TListBox
 	public TListBoxDrop()
 	{
 		super();
+		type = ComponentType.listBoxDrop;
 	}
 	
 	public TListBoxDrop(TGUIComponent parent)
 	{
 		super(parent);
+		type = ComponentType.listBoxDrop;
 		priority = 1; // higher priority over other types more likely
 	}
 	
 	public TListBoxDrop(TGUIComponent parent, float x, float y, int w, int h) throws SlickException
 	{
 		super(parent, x, y, w, h);
+		type = ComponentType.listBoxDrop;
 		normalHeight = h;
 		if (normalHeight < defH)
 			defH = normalHeight;
@@ -42,6 +44,7 @@ public class TListBoxDrop extends TListBox
 	public TListBoxDrop(TGUIComponent parent, float x, float y, int w, int h, int index) throws SlickException
 	{
 		super(parent, x, y, w, h, index);
+		type = ComponentType.listBoxDrop;
 		normalHeight = h;
 		if (normalHeight < defH)
 			defH = normalHeight;
@@ -78,7 +81,6 @@ public class TListBoxDrop extends TListBox
 			height = defH;
 	}
 	
-	@SuppressWarnings("static-access")
 	private void updateLBD() throws SlickException
 	{
 		if (graphic == null)
@@ -88,7 +90,7 @@ public class TListBoxDrop extends TListBox
 		canvas.setColor(TGUIManager.BLACK);
 		canvas.drawRect(0, 0, width - 1, (dropped ? height : defH) - 1); // draw the box outline/background
 		canvas.setFont(TGUIManager.guiFont);
-		if (parent.type == ComponentType.component)
+		if (parent.getType() == ComponentType.component)
 			background = parent.background;
 		
 		canvas.setColor(background);

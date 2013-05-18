@@ -11,33 +11,35 @@ import org.newdawn.slick.geom.Polygon;
 
 public class TListBoxDropGen<T> extends TListBoxDrop
 {
-	public static final ComponentType type = ComponentType.listBoxDropGen;
 	public List<Item> items;
 	
 	public TListBoxDropGen()
 	{
 		super();
+		type = ComponentType.listBoxDropGen;
 	}
 	
 	public TListBoxDropGen(TGUIComponent parent, float x, float y, int w, int h) throws SlickException
 	{
 		super(parent, x, y, w, h);
+		type = ComponentType.listBoxDropGen;
 		items = new ArrayList<Item>();
 	}
 	
 	public TListBoxDropGen(TGUIComponent parent, float x, float y, int w, int h, int index, Color background) throws SlickException
 	{
 		super(parent, x, y, w, h);
+		type = ComponentType.listBoxDropGen;
 		items = new ArrayList<Item>();
 	}
 	
 	public TListBoxDropGen(TGUIComponent parent, float x, float y, int w, int h, int index, Color background, int priority) throws SlickException
 	{
 		super(parent, x, y, w, h);
+		type = ComponentType.listBoxDropGen;
 		items = new ArrayList<Item>();
 	}
 	
-	@SuppressWarnings("static-access")
 	private void updateLBD() throws SlickException	// IS THIS NEEDED? INHERITED FROM LISTBOXDROP ALREADY
 	{
 		canvas = graphic.getGraphics();
@@ -45,7 +47,7 @@ public class TListBoxDropGen<T> extends TListBoxDrop
 		canvas.setColor(TGUIManager.BLACK);
 		canvas.drawRect(0, 0, width - 1, (dropped ? height : defH) - 1); // draw the box outline/background
 		canvas.setFont(TGUIManager.guiFont);
-		if (parent.type == ComponentType.component)
+		if (parent.getType() == ComponentType.component)
 			background = parent.background;
 		
 		canvas.setColor(background);

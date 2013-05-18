@@ -22,7 +22,6 @@ import org.newdawn.slick.SlickException;
  */
 public class TLabel extends TGUIComponent
 {
-	public static final ComponentType type = ComponentType.label;
 	protected String text;
 	protected String oldText;
 	protected String toDraw;
@@ -32,17 +31,20 @@ public class TLabel extends TGUIComponent
 	public TLabel()
 	{
 		super();
+		type = ComponentType.label;
 	}
 
 	public TLabel(TGUIComponent parent)
 	{
 		super(parent);
+		type = ComponentType.label;
 		text = oldText = "";
 	}
 
 	public TLabel(TGUIComponent parent, float x, float y, int w, int h, String t) throws SlickException
 	{
 		super(parent, x, y, w, h);
+		type = ComponentType.label;
 		text = oldText = t;
 		changed = true;
 	}

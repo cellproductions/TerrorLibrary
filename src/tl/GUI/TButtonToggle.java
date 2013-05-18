@@ -8,22 +8,24 @@ import org.newdawn.slick.SlickException;
 
 public class TButtonToggle extends TGUIComponent
 {
-	public static ComponentType type = ComponentType.buttonToggle;
 	public String text;
 	private ArrayList<String> toggles;
 	public int index;
 	public int oldIndex;
 	
+	TGUIClickedEvent mousePress;
 	TGUISelectionEvent selectionChange;
 
 	public TButtonToggle()
 	{
 		super();
+		type = ComponentType.buttonToggle;
 	}
 	
 	public TButtonToggle(TGUIComponent parent)
 	{
 		super(parent);
+		type = ComponentType.buttonToggle;
 		text = "";
 		toggles = new ArrayList<String>();
 	}
@@ -31,6 +33,7 @@ public class TButtonToggle extends TGUIComponent
 	public TButtonToggle(TGUIComponent parent, float x, float y, int w, int h) throws SlickException
 	{
 		super(parent, x, y, w, h);
+		type = ComponentType.buttonToggle;
 		text = "";
 		toggles = new ArrayList<String>();
 		changed = true;
@@ -95,6 +98,15 @@ public class TButtonToggle extends TGUIComponent
 	
 	public void mousePressed(int button, int x, int y)
 	{
+		if (enabled)
+		{
+			if (mouseIsOver())
+			{
+				if (mousePress != null)
+					mousePress.execute(button, x, y, this);
+				changed = true;
+			}
+		}
 	}
 	
 	public void mouseReleased(int button, int x, int y)
@@ -117,9 +129,19 @@ public class TButtonToggle extends TGUIComponent
 		}
 	}
 	
-	public void onMouseClick(TGUIClickedEvent function) // overloadable click (whatever user wants to do with it)
+	public void onMousePress(TGUIClickedEvent function)
+	{
+		mousePress = function;
+	}
+	
+	public void onMouseRelease(TGUIClickedEvent function)
 	{
 		mouseClick = function;
+	}
+	
+	public void onMouseClick(TGUIClickedEvent function) 
+	{
+		onMouseRelease(function);
 	}
 	
 	public void onMouseOver(TGUIMouseOverEvent function)

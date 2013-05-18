@@ -1,5 +1,6 @@
 package tl.GUI;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import tl.Util.TPoint;
@@ -91,6 +92,33 @@ public abstract class TGUILayout
 		components.add(component);
 		if (organiseOnAdd)
 			pOrganise();
+	}
+	
+	/**
+	 * Adds multiple components to the layout, in the one call, to be organised.<br>
+	 * It will throw a TGUIException if a component is null (note that is actually catches its own throw, but it will still exit the application gracefully).
+	 * @param components - The components to add. None of them should be null.
+	 */
+	public void addComponent(TGUIComponent ... components)
+	{
+		try
+		{
+			for (TGUIComponent component : components)
+			{
+				if (component == null)
+					throw new TGUIException("component is NULL!");
+				else
+				{
+					this.components.add(component);
+					if (organiseOnAdd)
+						pOrganise();
+				}
+			}
+		}
+		catch (TGUIException e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	/**

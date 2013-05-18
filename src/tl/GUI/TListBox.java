@@ -13,7 +13,6 @@ import tl.Util.TCursor;
 
 public class TListBox extends TGUIComponent implements TIGUICollection
 {
-	public static final ComponentType type = ComponentType.listBox;
 	protected List<String> items;
 	protected int numItems;
 	protected int selected;
@@ -28,11 +27,13 @@ public class TListBox extends TGUIComponent implements TIGUICollection
 	public TListBox()
 	{
 		super();
+		type = ComponentType.listBox;
 	}
 
 	public TListBox(TGUIComponent parent)
 	{
 		super(parent);
+		type = ComponentType.listBox;
 		items = new ArrayList<String>();
 		selected = -1;
 	}
@@ -40,6 +41,7 @@ public class TListBox extends TGUIComponent implements TIGUICollection
 	public TListBox(TGUIComponent parent, float x, float y, int w, int h) throws SlickException
 	{
 		super(parent, x, y, w, h);
+		type = ComponentType.listBox;
 		items = new ArrayList<String>();
 		selected = -1;
 		changed = true;
@@ -48,12 +50,12 @@ public class TListBox extends TGUIComponent implements TIGUICollection
 	public TListBox(TGUIComponent parent, float x, float y, int w, int h, int index) throws SlickException
 	{
 		super(parent, x, y, w, h);
+		type = ComponentType.listBox;
 		items = new ArrayList<String>();
 		selected = index;
 		changed = true;
 	}
 
-	@SuppressWarnings("static-access")
 	private void updateLB() throws SlickException
 	{
 		if (graphic == null)
@@ -63,7 +65,7 @@ public class TListBox extends TGUIComponent implements TIGUICollection
 		canvas.setColor(TGUIManager.BLACK);
 		canvas.drawRect(0, 0, width - 1, height - 1);
 		canvas.setFont(TGUIManager.guiFont);
-		if (parent.type == ComponentType.component)
+		if (parent.getType() == ComponentType.component)
 			background = parent.background;
 		
 		int fontHeight = gapHeight - 5;

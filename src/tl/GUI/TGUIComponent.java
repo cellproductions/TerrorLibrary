@@ -84,7 +84,7 @@ public class TGUIComponent implements TGUIInterface, Comparable<TGUIComponent>
 	 * A type that represents what kind of component the TGUIComponent is.
 	 * @see ComponentType
 	 */
-	public static final ComponentType type = ComponentType.component;
+	protected ComponentType type;
 	/* PROPERTIES_END */
 
 	/**
@@ -125,11 +125,13 @@ public class TGUIComponent implements TGUIInterface, Comparable<TGUIComponent>
 	
 	public TGUIComponent()
 	{
+		type = ComponentType.component;
 		enabled = true;
 	}
 
 	public TGUIComponent(TGUIComponent parent)
 	{
+		type = ComponentType.component;
 		if (parent == null)
 			ID = TGUIManager.numGUIs++;
 		else
@@ -162,6 +164,7 @@ public class TGUIComponent implements TGUIInterface, Comparable<TGUIComponent>
 	
 	public TGUIComponent(TGUIComponent parent, float i, float j, boolean visible, int w, int h, float t)
 	{
+		type = ComponentType.component;
 		if (parent == null)
 			ID = TGUIManager.numGUIs++;
 		else
@@ -191,6 +194,11 @@ public class TGUIComponent implements TGUIInterface, Comparable<TGUIComponent>
 	public int getID()
 	{
 		return ID;
+	}
+	
+	public ComponentType getType()
+	{
+		return type;
 	}
 	
 	private void updateC() throws SlickException
@@ -366,7 +374,7 @@ public class TGUIComponent implements TGUIInterface, Comparable<TGUIComponent>
 			graphic.setAlpha(notnull ? (parent.graphic  != null ? parent.graphic.getAlpha() : 1f) : 1f);
 	}
 	
-	public TGUIComponent child(int index) throws TGUIException
+	public synchronized TGUIComponent child(int index) throws TGUIException
 	{
 		if (children == null)
 			throw new TGUIException(type.toString() + "[" + ID + "]: component has no children!");
@@ -375,7 +383,7 @@ public class TGUIComponent implements TGUIInterface, Comparable<TGUIComponent>
 		return children.get(index);
 	}
 	
-	public void addComponent(TGUIComponent child)
+	public synchronized void addComponent(TGUIComponent child)
 	{
 		try
 		{
@@ -400,7 +408,7 @@ public class TGUIComponent implements TGUIInterface, Comparable<TGUIComponent>
 		}
 	}
 	
-	public void removeComponent(TGUIComponent child) throws TGUIException
+	public synchronized void removeComponent(TGUIComponent child) throws TGUIException
 	{
 		if (children == null)
 			throw new TGUIException(type.toString() + "[" + ID + "]: component has no children!");
@@ -410,7 +418,7 @@ public class TGUIComponent implements TGUIInterface, Comparable<TGUIComponent>
 		child.setPosition(child.x, child.y);
 	}
 	
-	public void removeComponent(int index) throws TGUIException
+	public synchronized void removeComponent(int index) throws TGUIException
 	{
 		if (children == null)
 			throw new TGUIException(type.toString() + "[" + ID + "]: component has no children!");
@@ -420,6 +428,20 @@ public class TGUIComponent implements TGUIInterface, Comparable<TGUIComponent>
 		child.parent = null;
 		child.setProperties(null);
 		children.remove(index);
+	}
+	
+	public synchronized void clearChildren()
+	{
+		if (children != null)
+		{
+			while (!children.isEmpty())
+			{
+				TGUIComponent child = children.get(0);
+				child.parent = null;
+				child.setProperties(null);
+				children.remove(0);
+			}
+		}
 	}
 	
 	public int childCount()

@@ -6,25 +6,28 @@ import org.newdawn.slick.SlickException;
 
 public class TButton extends TGUIComponent
 {
-	public static final ComponentType type = ComponentType.button;
 	private Image normal;
 	private Image pushed;
 	private String text;
+	private TGUIClickedEvent mousePress;
 	
 	public TButton()
 	{
 		super();
+		type = ComponentType.button;
 	}
 	
 	public TButton(TGUIComponent parent)
 	{
 		super(parent);
+		type = ComponentType.button;
 		text = "";
 	}
 	
 	public TButton(TGUIComponent parent, float x, float y, int w, int h)
 	{
 		super(parent, x, y, w, h);
+		type = ComponentType.button;
 		text = "";
 		changed = true;
 	}
@@ -32,6 +35,7 @@ public class TButton extends TGUIComponent
 	public TButton(TGUIComponent parent, float x, float y, int w, int h, String t) throws SlickException
 	{
 		super(parent, x, y, w, h);
+		type = ComponentType.button;
 		text = t;
 		changed = true;
 	}
@@ -74,6 +78,11 @@ public class TButton extends TGUIComponent
 		changed = true;
 	}
 */
+	public ComponentType getType()
+	{
+		return type;
+	}
+	
 	@SuppressWarnings("deprecation")
 	private void updateB() throws SlickException
 	{
@@ -153,6 +162,15 @@ public class TButton extends TGUIComponent
 				if (mouseIsOver())
 					graphic = pushed;
 			}
+			
+			if (mouseIsOver())
+			{
+				if (mousePress != null)
+				{
+					mousePress.execute(button, x, y, this);
+					changed = true;
+				}
+			}
 		}
 	}
 	
@@ -174,7 +192,12 @@ public class TButton extends TGUIComponent
 		}
 	}
 	
-	public void onMouseClick(TGUIClickedEvent function)
+	public void onMousePress(TGUIClickedEvent function)
+	{
+		mousePress = function;
+	}
+	
+	public void onMouseRelease(TGUIClickedEvent function)
 	{
 		mouseClick = function;
 	}
@@ -182,6 +205,11 @@ public class TButton extends TGUIComponent
 	public void onMouseOver(TGUIMouseOverEvent function)
 	{
 		mouseOver = function;
+	}
+	
+	public void onMouseClick(TGUIClickedEvent function) 
+	{
+		onMouseRelease(function);
 	}
 	
 	public void setText(String text)

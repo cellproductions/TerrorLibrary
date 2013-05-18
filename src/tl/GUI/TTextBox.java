@@ -15,7 +15,6 @@ import org.newdawn.slick.geom.Rectangle;
 
 public class TTextBox extends TGUIComponent
 {
-	public static final ComponentType type = ComponentType.textBox;
 	public static TTextBox activeTB;
 	
 	private String oldText;
@@ -27,6 +26,7 @@ public class TTextBox extends TGUIComponent
 	public TTextBox()
 	{
 		super();
+		type = ComponentType.textBox;
 		if (TTextBox.activeTB == null)
 			TTextBox.activeTB = this;
 	}
@@ -34,6 +34,7 @@ public class TTextBox extends TGUIComponent
 	public TTextBox(TGUIComponent parent)
 	{
 		super(parent);
+		type = ComponentType.textBox;
 		if (TTextBox.activeTB == null)
 			TTextBox.activeTB = this;
 		text = oldText = "";
@@ -42,6 +43,7 @@ public class TTextBox extends TGUIComponent
 	public TTextBox(TGUIComponent parent, float x, float y, int w, int h) throws SlickException
 	{
 		super(parent, x, y, w, h);
+		type = ComponentType.textBox;
 		if (TTextBox.activeTB == null)
 			TTextBox.activeTB = this;
 		text = oldText = "";
@@ -51,6 +53,7 @@ public class TTextBox extends TGUIComponent
 	public TTextBox(TGUIComponent parent, float x, float y, int w, int h, String def) throws SlickException
 	{
 		super(parent, x, y, w, h);
+		type = ComponentType.textBox;
 		if (TTextBox.activeTB == null)
 			TTextBox.activeTB = this;
 		text = oldText = def;

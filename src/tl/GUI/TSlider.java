@@ -9,7 +9,6 @@ import tl.Util.TCursor;
 
 public class TSlider extends TGUIComponent
 {
-	public static final ComponentType type = ComponentType.slider;
 	private long max;
 	private long min;
 	private long value;
@@ -23,16 +22,19 @@ public class TSlider extends TGUIComponent
 	public TSlider()
 	{
 		super();
+		type = ComponentType.slider;
 	}
 
 	public TSlider(TGUIComponent parent)
 	{
 		super(parent);
+		type = ComponentType.slider;
 	}
 
 	public TSlider(TGUIComponent parent, float x, float y, int w, int h, int ma, int mi, int v) throws SlickException
 	{
 		super(parent, x, y, w, h);
+		type = ComponentType.slider;
 		max = ma;
 		min = mi;
 		value = v;

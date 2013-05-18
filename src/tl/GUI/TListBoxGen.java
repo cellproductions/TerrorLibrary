@@ -10,27 +10,28 @@ import org.newdawn.slick.geom.Polygon;
 
 public class TListBoxGen<T> extends TListBox
 {
-	public static final ComponentType type = ComponentType.listBoxGen;
 	public List<Item> items;
 	
 	public TListBoxGen()
 	{
 		super();
+		type = ComponentType.listBoxGen;
 	}
 	
 	public TListBoxGen(TGUIComponent parent, float x, float y, int w, int h) throws SlickException
 	{
 		super(parent, x, y, w, h);
+		type = ComponentType.listBoxGen;
 		items = new ArrayList<Item>();
 	}
 	
 	public TListBoxGen(TGUIComponent parent, float x, float y, int w, int h, int index) throws SlickException
 	{
 		super(parent, x, y, w, h, index);
+		type = ComponentType.listBoxGen;
 		items = new ArrayList<Item>();
 	}
 	
-	@SuppressWarnings("static-access")
 	private void updateLB() throws SlickException
 	{
 		canvas = graphic.getGraphics();
@@ -38,7 +39,7 @@ public class TListBoxGen<T> extends TListBox
 		canvas.setColor(TGUIManager.BLACK);
 		canvas.drawRect(0, 0, width - 1, height - 1);
 		canvas.setFont(TGUIManager.guiFont);
-		if (parent.type == ComponentType.component)
+		if (parent.getType() == ComponentType.component)
 			background = parent.background;
 		
 		int fontHeight = gapHeight - 5;

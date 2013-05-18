@@ -12,7 +12,6 @@ import tl.Util.TCursor;
 
 public class TContainer<T> extends TGUIComponent implements TIGUICollection
 {
-	public static final ComponentType type = ComponentType.container;
 	private ArrayList<Item> items;
 	private int numItems;
 	private int numDown;
@@ -29,11 +28,13 @@ public class TContainer<T> extends TGUIComponent implements TIGUICollection
 	public TContainer()
 	{
 		super();
+		type = ComponentType.container;
 	}
 	
 	public TContainer(TGUIComponent parent)
 	{
 		super(parent);
+		type = ComponentType.container;
 		items = new ArrayList<Item>();
 		selected = -1;
 	}
@@ -41,6 +42,7 @@ public class TContainer<T> extends TGUIComponent implements TIGUICollection
 	public TContainer(TGUIComponent parent, float x, float y, int w, int h) throws SlickException
 	{
 		super(parent, x, y, w, h);
+		type = ComponentType.container;
 		items = new ArrayList<Item>();
 		iWidth = 30;
 		iHeight = 30;
@@ -52,6 +54,7 @@ public class TContainer<T> extends TGUIComponent implements TIGUICollection
 	public TContainer(TGUIComponent parent, float x, float y, int w, int h, int iw, int ih, int gap) throws SlickException
 	{
 		super(parent, x, y, w, h);
+		type = ComponentType.container;
 		items = new ArrayList<Item>();
 		iWidth = iw;
 		iHeight = ih;
