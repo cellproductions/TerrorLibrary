@@ -1,6 +1,5 @@
 package tl.GUI;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 import tl.Util.TPoint;
@@ -14,7 +13,7 @@ import tl.Util.TPoint;
  * @see TGUIVBoxLayout
  * @see TGUIHBoxLayout
  */
-public abstract class TGUILayout
+public abstract class TGUILayout extends TGUIObject
 {
 	/**
 	 * The spacing in pixels between each component.
@@ -178,7 +177,7 @@ public abstract class TGUILayout
 	}
 	
 	/**
-	 * @return Returns the number of components in the layout.
+	 * @return - Returns the number of components in the layout.
 	 */
 	public int getSize()
 	{

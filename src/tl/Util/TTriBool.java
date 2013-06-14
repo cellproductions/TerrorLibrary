@@ -15,7 +15,7 @@ public enum TTriBool
 		return value;
 	}
 	
-	public static TTriBool parseTriBool(String s)
+	public static TTriBool parseTriBool(String s) throws TException
 	{
 		String cmp = s.toUpperCase();
 		if (cmp.equals("TRUE") || cmp.equals("1"))
@@ -24,6 +24,20 @@ public enum TTriBool
 			return FALSE;
 		else if (cmp.equals("UNDEFINED") || cmp.equals("-1"))
 			return UNDEFINED;
-		return null;
+		else
+			throw new TException("value " + s + " is an invalid TTriBol value!");
+	}
+	
+	public static TTriBool parseTriBool(byte b) throws TException
+	{
+		if (b < -1 || b > 1)
+			throw new TException("value " + b + " is an invalid TTriBool value!");
+		
+		if (b == 1)
+			return TRUE;
+		else if (b == 0)
+			return FALSE;
+		else
+			return UNDEFINED;
 	}
 }

@@ -1,6 +1,6 @@
 package tl.GUI;
 
-public class TGUIException extends Exception
+public class TGUIException extends RuntimeException
 {
 	private static final long serialVersionUID = 2261898731161280040L;
 	

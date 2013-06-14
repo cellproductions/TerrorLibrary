@@ -1,5 +1,6 @@
 package tl.GUI;
 
+import java.lang.StringBuffer;
 import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -19,6 +20,8 @@ public class TTextBox extends TGUIComponent
 	
 	private String oldText;
 	private String text;
+	private Position position;
+	private float typos; // text y position
 	
 	private TGUITextEvent textChange;
 	private TGUITextEvent enterKey;
@@ -38,6 +41,7 @@ public class TTextBox extends TGUIComponent
 		if (TTextBox.activeTB == null)
 			TTextBox.activeTB = this;
 		text = oldText = "";
+		position = new Position();
 	}
 	
 	public TTextBox(TGUIComponent parent, float x, float y, int w, int h) throws SlickException
@@ -47,9 +51,11 @@ public class TTextBox extends TGUIComponent
 		if (TTextBox.activeTB == null)
 			TTextBox.activeTB = this;
 		text = oldText = "";
+		position = new Position();
 		changed = true;
 	}
 
+	@SuppressWarnings("deprecation")
 	public TTextBox(TGUIComponent parent, float x, float y, int w, int h, String def) throws SlickException
 	{
 		super(parent, x, y, w, h);
@@ -57,6 +63,8 @@ public class TTextBox extends TGUIComponent
 		if (TTextBox.activeTB == null)
 			TTextBox.activeTB = this;
 		text = oldText = def;
+		position = new Position();
+		typos = height / 2 - (TGUIManager.guiFont.getHeight(text) / 2) - 2;
 		changed = true;
 	}
 
@@ -64,8 +72,6 @@ public class TTextBox extends TGUIComponent
 	{
 		return enabled && TTextBox.activeTB == this;
 	}
-
-	private String toDraw;
 	
 	@SuppressWarnings("deprecation")
 	private void updateText() throws SlickException
@@ -77,17 +83,18 @@ public class TTextBox extends TGUIComponent
 		canvas.setFont(TGUIManager.guiFont);
 		canvas.setColor(new Color(0, 0, 0));
 		canvas.draw(new Rectangle(1, 1, width - 1, height - 1));
-		int w = TGUIManager.guiFont.getWidth(toDraw + "_");
-		if (w > width + 16)
-			toDraw = toDraw.substring(0, toDraw.length() - 1);
-		canvas.drawString(toDraw, 3, height / 2 - (TGUIManager.guiFont.getHeight(toDraw) / 2) - 2);
+		typos = height / 2 - (TGUIManager.guiFont.getHeight(text) / 2) - 2;
+		if (isActive())
+			canvas.drawString("_", TGUIManager.guiFont.getWidth(position.get() < text.length() ? text.substring(0, position.get()) : text), typos + 2);
+		canvas.drawString(text, 3, typos);
 		canvas.flush();
 	}
 	
-	private boolean backspaceDown = false;
+	private boolean arrowdown;
+	private boolean backspacedown = false;
 	private boolean ctrlDown = false;
-	private double time = 0; // used to count each frame
-	private final double frames = 3.0;
+	private Time bstime = new Time(15f, 3f);
+	private Time arrowtime = new Time(15f, 3f);
 
 	public void update(Graphics g)
 	{
@@ -100,26 +107,49 @@ public class TTextBox extends TGUIComponent
 			}
 		}
 		
-		if (isActive())
+		if (isActive() && !text.isEmpty())
 		{
 			ctrlDown = TGUIManager.guiInput.isKeyDown(Input.KEY_LCONTROL) || TGUIManager.guiInput.isKeyDown(Input.KEY_RCONTROL);
-		
-			if (backspaceDown) // if the backspace key is being held down
+			
+			if (backspacedown) // if the backspace key is being held down
 			{
-				if (time < frames) 
-					time++;
-				else // if timer is complete
+				if (bstime.hasFinished())
 				{
 					if (TGUIManager.guiInput.isKeyDown(Input.KEY_BACK))
 					{
-						if (!text.isEmpty())
+						if (position.get() - 1 > -1)
 						{
 							oldText = text;
-							text = text.substring(0, text.length() - 1);
+							text = new StringBuffer(text).deleteCharAt(position.get() - 1).toString();
+							position.left();
 							changed = true;
 						}
 					}
-					time = 0;
+					else if (TGUIManager.guiInput.isKeyDown(Input.KEY_DELETE))
+					{
+						if (position.get() < text.length())
+						{
+							oldText = text;
+							text = new StringBuffer(text).deleteCharAt(position.get()).toString();
+							changed = true;
+						}
+					}
+				}
+			}
+			else if (arrowdown)
+			{
+				if (arrowtime.hasFinished())
+				{
+					if (TGUIManager.guiInput.isKeyDown(Input.KEY_LEFT))
+					{
+						position.left();
+						changed = true;
+					}
+					else if (TGUIManager.guiInput.isKeyDown(Input.KEY_RIGHT))
+					{
+						position.right();
+						changed = true;
+					}
 				}
 			}
 		}
@@ -133,8 +163,6 @@ public class TTextBox extends TGUIComponent
 				changed = true;
 			}
 		}
-		
-		toDraw = (TTextBox.activeTB == this ? text + "_" : text);
 		
 		try
 		{
@@ -193,28 +221,45 @@ public class TTextBox extends TGUIComponent
 			{
 				if (c >= 32 && c <= 126)
 				{
-					if (toDraw.charAt(toDraw.length() - 1) == '_')
+					int w = TGUIManager.guiFont.getWidth(text + Character.toString(c));
+					if (w < width - 4)
 					{
-						int w = TGUIManager.guiFont.getWidth(text + Character.toString(c));
-						if (w < width - 4)
-						{
-							oldText = text;
-							text += Character.toString(c);
-							changed = true;
-						}
+						oldText = text;
+						text = new StringBuffer(text).insert(position.get(), c).toString();
+						position.right();
+						changed = true;
 					}
 				}
 				
 				if (key == Input.KEY_BACK)
 				{
-					time = 0;
-					backspaceDown = true;
+					backspacedown = true;
+					bstime.start();
 					
 					if (!text.isEmpty())
 					{
-						oldText = text;
-						text = text.substring(0, text.length() - 1);
-						changed = true;
+						if (position.get() - 1 > -1)
+						{
+							oldText = text;
+							text = new StringBuffer(text).deleteCharAt(position.get() - 1).toString();
+							position.left();
+							changed = true;
+						}
+					}
+				}
+				else if (key == Input.KEY_DELETE)
+				{
+					backspacedown = true;
+					bstime.start();
+					
+					if (!text.isEmpty())
+					{
+						if (position.get() < text.length())
+						{
+							oldText = text;
+							text = new StringBuffer(text).deleteCharAt(position.get()).toString();
+							changed = true;
+						}
 					}
 				}
 				else if (key == Input.KEY_V)
@@ -251,6 +296,20 @@ public class TTextBox extends TGUIComponent
 						changed = true;
 					}
 				}
+				else if (key == Input.KEY_LEFT)
+				{
+					arrowtime.start();
+					position.left();
+					arrowdown = true;
+					changed = true;
+				}
+				else if (key == Input.KEY_RIGHT)
+				{
+					arrowtime.start();
+					position.right();
+					arrowdown = true;
+					changed = true;
+				}
 			}
 		}
 	}
@@ -258,10 +317,13 @@ public class TTextBox extends TGUIComponent
 	public void keyReleased(int key, char c)
 	{
 		if (key == Input.KEY_BACK)
-		{
-			backspaceDown = false;
-			time = 0;
-		}
+			backspacedown = false;
+		else if (key == Input.KEY_DELETE)
+			backspacedown = false;
+		else if (key == Input.KEY_LEFT)
+			arrowdown = false;
+		else if (key == Input.KEY_RIGHT)
+			arrowdown = false;
 	}
 	
 	public void onMouseClick(TGUIClickedEvent function)
@@ -288,11 +350,63 @@ public class TTextBox extends TGUIComponent
 	{
 		oldText = text;
 		this.text = text;
+		if (position.get() > text.length())
+			position.set(text.length());
 		changed = true;
 	}
 	
 	public String getText()
 	{
 		return text;
+	}
+	
+	public void clear()
+	{
+		text = "";
+		position.set(0);
+	}
+	
+	private class Position
+	{
+		int position;
+		public void set(int i) { position = i; }
+		public void left() { position = position - 1 > -1 ? position - 1 : 0; }
+		public void right() { position = position + 1 < text.length() + 1 ? position + 1 : text.length(); }
+		public int get() { return position; }
+	}
+	
+	private class Time
+	{
+		double wait;
+		boolean waitdone;
+		public double limit;
+		public double time;
+		
+		public Time(double waittime, double limit) { wait = waittime; this.limit = limit; }
+		
+		public void start()
+		{
+			waitdone = false;
+			time = 0;
+		}
+		
+		public boolean hasFinished()
+		{
+			if (time < wait && !waitdone)
+				++time;
+			else
+				waitdone = true;
+			if (waitdone)
+			{
+				if (time < limit)
+					++time;
+				else
+				{
+					time = 0;
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 }

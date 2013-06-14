@@ -108,4 +108,52 @@ public class TPoint
 	{
 		return x + "," + y;
 	}
+	
+	/**
+	 * Used for converting an x index and a y index into a single index for use in a 1D array.<br>
+	 * E.g.<br>
+	 * <pre>
+	 * {@code
+	 * Image image = new Image(5, 10); // 5 width, 10 height
+	 * byte data[] = image.getTexture().getTextureData();
+	 * for (int y = 0; y < 10; ++y)
+	 *     for (int x = 0; x < 5; ++x)
+	 *         System.out.println(data[Point.get1DIndex(y, 5, x)]); // will print out indexes 0 to 50
+	 * }
+	 * </pre>
+	 * @param py - Index y
+	 * @param width - Width of a row in the 2D array
+	 * @param px - Index x
+	 * @return - The 1D index
+	 * @see #get2DIndex(int, int, int)
+	 */
+	public static int get1DIndex(int py, int width, int px)
+	{
+		return py * width + px;
+	}
+	
+	/**
+	 * Used for converting a single 1D index into a 2D index.<br>
+	 * E.g.<br>
+	 * <pre>
+	 * {@code
+	 * Image image = new Image(5, 10); // 5 width, 10 height
+	 * byte newdata[][] = new byte[image.getWidth()][image.getHeight()];
+	 * byte data[] = image.getTexture().getTextureData();
+	 * int len = data.length;
+	 * for (int i = 0; i < len; ++i)
+	 * {
+	 *     TPoint index = TPoint.get2DIndex(i, image.getWidth());
+	 *     newdata[index.x][index.y] = data[i];
+	 * }
+	 * }
+	 * </pre>
+	 * @param index - The 1D index
+	 * @param width - The width of a row in the 2D array
+	 * @return - The new 2D index
+	 */
+	public static TPoint get2DIndex(int index, int width)
+	{
+		return new TPoint(index % width, index / width);
+	}
 }

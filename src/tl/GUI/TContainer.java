@@ -289,6 +289,15 @@ public class TContainer<T> extends TGUIComponent implements TIGUICollection
 		return selected;
 	}
 	
+	public void removeSelected()
+	{
+		items.remove(selected);
+		numItems--;
+		if (!toobig)
+			numDown = 0;
+		changed = true;
+	}
+	
 	private class Item
 	{
 		public Image iGraphic;

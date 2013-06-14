@@ -210,7 +210,7 @@ public class TListBox extends TGUIComponent implements TIGUICollection
 	
 	protected boolean mouseIsOverItem()
 	{
-		return mouseIsOver() && !mouseIsWithinScroll();
+		return mOver() && !mouseIsWithinScroll();
 	}
 	
 	protected boolean mouseIsWithinScroll()
@@ -241,6 +241,18 @@ public class TListBox extends TGUIComponent implements TIGUICollection
 	public int getSelected()
 	{
 		return selected;
+	}
+	
+	public void removeSelected()
+	{
+		if (selected > -1)
+		{
+			items.remove(selected);
+			numItems--;
+			if (!toobig)
+				numDown = 0;
+		}
+		changed = true;
 	}
 
 	public boolean isEmpty()

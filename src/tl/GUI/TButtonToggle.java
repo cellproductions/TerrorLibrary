@@ -8,10 +8,9 @@ import org.newdawn.slick.SlickException;
 
 public class TButtonToggle extends TGUIComponent
 {
-	public String text;
+	protected String text;
 	private ArrayList<String> toggles;
-	public int index;
-	public int oldIndex;
+	protected int index;
 	
 	TGUIClickedEvent mousePress;
 	TGUISelectionEvent selectionChange;
@@ -62,13 +61,6 @@ public class TButtonToggle extends TGUIComponent
 
 	public void update(Graphics g)
 	{
-		if (hasChanged() > -1)
-		{
-			if (selectionChange != null)
-				selectionChange.execute(index, this);
-			changed = true;
-		}
-		
 		if (mouseIsOver())
 		{
 			if (mouseOver != null)
@@ -154,13 +146,6 @@ public class TButtonToggle extends TGUIComponent
 		selectionChange = function;
 	}
 	
-	private int hasChanged()
-	{
-		if (oldIndex != index)
-			return (oldIndex = index);
-		return -1;
-	}
-	
 	public void addItem(String item)
 	{
 		if (toggles.isEmpty())
@@ -168,14 +153,38 @@ public class TButtonToggle extends TGUIComponent
 		toggles.add(item);
 	}
 	
+	public void removeItem(String item) throws TGUIException
+	{
+		if (!toggles.remove(item))
+			throw new TGUIException("item " + item + " does not exist!");
+		else
+			prev();
+	}
+	
+	public void removeItem(int index) throws TGUIException
+	{
+		if (index < 0 || index >= toggles.size())
+			throw new TGUIException("index " + index + " out of bounds!");
+		toggles.remove(index);
+		prev();
+	}
+	
+	public String getItem(int index) throws TGUIException
+	{
+		if (index < 0 || index >= toggles.size())
+			throw new TGUIException("index " + index + " out of bounds!");
+		return toggles.get(index);
+	}
+	
 	public void setIndex(int index) throws TGUIException
 	{
 		if (index < 0 || index >= toggles.size())
 			throw new TGUIException("index " + index + " out of bounds!");
 		
-		oldIndex = this.index;
 		this.index = index;
 		text = toggles.get(index);
+		if (selectionChange != null)
+			selectionChange.execute(this.index, this);
 		changed = true;
 	}
 	

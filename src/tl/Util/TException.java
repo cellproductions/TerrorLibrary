@@ -1,6 +1,6 @@
 package tl.Util;
 
-public class TException extends Exception
+public class TException extends RuntimeException
 {
 	private static final long serialVersionUID = -1907149475416431282L;
 

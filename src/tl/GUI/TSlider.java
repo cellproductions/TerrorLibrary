@@ -47,13 +47,13 @@ public class TSlider extends TGUIComponent
 	}
 	
 	private float valuex;
+	private final int xOffSet = 2;
 
 	private void updateSlider() throws SlickException
 	{
 		if (graphic == null)
 		{
-			int xOffSet = 2;
-			int w = width;
+			int w = width - xOffSet;
 			int h = height;
 			box = new Image(w, h);
 			canvas = box.getGraphics();
@@ -90,14 +90,14 @@ public class TSlider extends TGUIComponent
 			canvas.flush();
 		}
 		
-		float pos = valuex - slide.getWidth() / 2;
+		float pos = valuex - slide.getWidth() / xOffSet;
 		canvas = graphic.getGraphics();
 		canvas.clear();
-		canvas.drawImage(box, 2, slide.getHeight() / 2 - (box.getHeight() / 2));
-		if (pos < 2)
-			pos = 2;
-		else if (pos >= box.getWidth() + 2) // these checks keep the slider within the bounds of its box
-			pos = box.getWidth() + 2;
+		canvas.drawImage(box, xOffSet, slide.getHeight() / xOffSet - (box.getHeight() / xOffSet));
+		if (pos < xOffSet)
+			pos = xOffSet;
+		else if (pos >= box.getWidth() + xOffSet) // these checks keep the slider within the bounds of its box
+			pos = box.getWidth() + xOffSet;
 		canvas.drawImage(slide, pos, 0);
 		if (TGUIManager.debug)
 		{

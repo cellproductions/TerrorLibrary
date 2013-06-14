@@ -16,7 +16,7 @@ import tl.Util.TCursor;
  * @author Callum Nichols
  * @since 2.0
  */
-public class TGUIComponent implements TGUIInterface, Comparable<TGUIComponent>
+public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparable<TGUIComponent>
 {
 	protected Image graphic;
 	protected Graphics canvas; // canvas used to draw the default textures onto the graphic
@@ -36,11 +36,7 @@ public class TGUIComponent implements TGUIInterface, Comparable<TGUIComponent>
 	 * @see #getID()
 	 */
 	protected int ID;
-	/**
-	 * The x position on the parent component (position on the screen if parent is null).
-	 * @see #getX()
-	 * @see #setPosition(float, float)
-	 */
+	
 	protected float x;
 	/**
 	 * The y position on the parent component (position on the screen if parent is null).
@@ -51,11 +47,13 @@ public class TGUIComponent implements TGUIInterface, Comparable<TGUIComponent>
 	/**
 	 * The x position on the main window.
 	 * @see #getScreenX()
+	 * @see #setPosition(float, float)
 	 */
 	protected float gx;
 	/**
 	 * The y position on the main window.
 	 * @see #getScreenY()
+	 * @see #setPosition(float, float)
 	 */
 	protected float gy;
 	/**
@@ -135,16 +133,7 @@ public class TGUIComponent implements TGUIInterface, Comparable<TGUIComponent>
 		if (parent == null)
 			ID = TGUIManager.numGUIs++;
 		else
-		{
-			try
-			{
-				setParent(parent);
-			}
-			catch (TGUIException e)
-			{
-				e.printStackTrace();
-			}
-		}
+			setParent(parent);
 		enabled = parent != null ? parent.enabled : true;
 		visible = parent != null ? parent.visible : true;
 	}
@@ -168,16 +157,7 @@ public class TGUIComponent implements TGUIInterface, Comparable<TGUIComponent>
 		if (parent == null)
 			ID = TGUIManager.numGUIs++;
 		else
-		{
-			try
-			{
-				setParent(parent);
-			}
-			catch (TGUIException e)
-			{
-				e.printStackTrace();
-			}
-		}
+			setParent(parent);
 		x = i;
 		y = j;
 		gx = (parent != null ? parent.x : 0) + x;
@@ -253,6 +233,22 @@ public class TGUIComponent implements TGUIInterface, Comparable<TGUIComponent>
 	}
 
 	public boolean mouseIsOver()
+	{
+		if (children != null)
+		{
+			for (TGUIComponent child : children)
+				if (child.mouseIsOver())
+					return false;
+		}
+		return mOver();
+	}
+	
+	/**
+	 * Protected mouseIsOver() function, called by mouseIsOver().
+	 * @return - whether or not the cursor is over the component
+	 * @see #mouseIsOver()
+	 */
+	protected boolean mOver()
 	{
 		float x = TCursor.getX();
 		float y = TCursor.getY();
@@ -385,26 +381,19 @@ public class TGUIComponent implements TGUIInterface, Comparable<TGUIComponent>
 	
 	public synchronized void addComponent(TGUIComponent child)
 	{
-		try
+		if (child == null)
+			throw new TGUIException(type.toString() + "[" + ID + "]: child component is NULL!");
+		if (child.parent != this)
+			throw new TGUIException(type.toString() + "[" + ID + "]: childs[" + child.ID + "] parent has not been set as this component!");
+		if (children == null)
+			children = new ArrayList<TGUIComponent>();
+		if (!children.contains(child))
 		{
-			if (child == null)
-				throw new TGUIException(type.toString() + "[" + ID + "]: child component is NULL!");
-			if (child.parent != this)
-				throw new TGUIException(type.toString() + "[" + ID + "]: childs[" + child.ID + "] parent has not been set as this component!");
-			if (children == null)
-				children = new ArrayList<TGUIComponent>();
-			if (!children.contains(child))
-			{
-				child.setProperties(this);
-				children.add(child);
-				int id = 0;
-				for (TGUIComponent c : children)
-					c.ID = id++;
-			}
-		}
-		catch(TGUIException e)
-		{
-			e.printStackTrace();
+			child.setProperties(this);
+			children.add(child);
+			int id = 0;
+			for (TGUIComponent c : children)
+				c.ID = id++;
 		}
 	}
 	

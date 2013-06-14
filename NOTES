@@ -1,31 +1,25 @@
 TODO:
 
 ButtonToggle:
-* set 'index' to protected, remove oldIndex, make sure setIndex() throws an exception
-* remove obselete hasChanged() and oldIndex and replace with setIndex()
 
 
 Container:
 * Container needs all mouse input components added
 * fix widths to account for scroll bar (or horizontal scrolling?)
 * Make a ContainerGen class that inherits Container, Container stores images, ContainerGen stores images and generic objects
-* fill out scroll functions
+* fill out scroll functions + sort function
 
 
 Label:
-* Label needs all mouse input components added
-* Labels could do auto line wrapping
-* Labels could also centre the text (centreText function)
-* should draw text starting from x=0, y=0
 
 
 LabelExtended:
+* needs to be finished
 * LabelExtended needs all mouse input components added
 
 
 Slider:
 * Slider needs all mouse input components added
-* update Slider so that it uses the 'changed' variable
 
 
 ListBox:
@@ -44,7 +38,7 @@ ListBoxDrop:
 
 
 TextBox:
-* text box's should allow typing sentences outside of the box area, also left + right buttons should move a 'positioner' of sorts to let you type anywhere
+* text box's should allow typing sentences outside of the box area
 * if there is enough vertical space, allow multiple lines of text to be typed
 * upon tab key being pressed, set next textbox in set (from parent) to the active one (or in the next set if there are no more textbox's in the current set)
 
@@ -76,10 +70,13 @@ GUI:
 * check exception handling throughout gui stuff
 * make sure that all GUI and GUIControls can handle using an image
 * create Interfaces that describe different functions for GUIComponents
-
+* create TGUIOutOfBoundsException that prints the error along with the id and possible range (and the value that was wrong), example in TGUIComponent
+	* replace all exceptions amongst all guis with this one
+* add a static distance method to TPoint
 
 BUGS:
 * sliders dont set the slider at the right position from the constructor
 * sliders dont 'slide' anymore, they must slide :P
 * clicking on an Item in a ListBox gets gradually more offset for some reason (same in other collection implemented subclasses)
 * ListBox numDown is 1 off when using scrollDown/Up compared to normal click scrolling (perhaps make click scroll use scrollDown/Up functions)
+* label word wrapping sometimes adds a space to the list lines, also inf-loops when [[ involved
