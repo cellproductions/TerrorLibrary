@@ -12,7 +12,6 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.geom.Rectangle;
 
 public class TTextBox extends TGUIComponent
 {
@@ -20,8 +19,8 @@ public class TTextBox extends TGUIComponent
 	
 	private String oldText;
 	private String text;
-	private Position position;
-	private float typos; // text y position
+	private Position tPosition;
+	private float typos; // text y tPosition
 	
 	private TGUITextEvent textChange;
 	private TGUITextEvent enterKey;
@@ -41,7 +40,7 @@ public class TTextBox extends TGUIComponent
 		if (TTextBox.activeTB == null)
 			TTextBox.activeTB = this;
 		text = oldText = "";
-		position = new Position();
+		tPosition = new Position();
 	}
 	
 	public TTextBox(TGUIComponent parent, float x, float y, int w, int h) throws SlickException
@@ -51,7 +50,7 @@ public class TTextBox extends TGUIComponent
 		if (TTextBox.activeTB == null)
 			TTextBox.activeTB = this;
 		text = oldText = "";
-		position = new Position();
+		tPosition = new Position();
 		changed = true;
 	}
 
@@ -63,8 +62,8 @@ public class TTextBox extends TGUIComponent
 		if (TTextBox.activeTB == null)
 			TTextBox.activeTB = this;
 		text = oldText = def;
-		position = new Position();
-		typos = height / 2 - (TGUIManager.guiFont.getHeight(text) / 2) - 2;
+		tPosition = new Position();
+		typos = size.height / 2 - (TGUIManager.guiFont.getHeight(text) / 2) - 2;
 		changed = true;
 	}
 
@@ -76,16 +75,16 @@ public class TTextBox extends TGUIComponent
 	@SuppressWarnings("deprecation")
 	private void updateText() throws SlickException
 	{
-		if (graphic == null)
-			graphic = new Image(width, height);
+		if (graphic == TGUIManager.emptyImage)
+			graphic = new Image(size.width, size.height);
 		canvas = graphic.getGraphics();
 		canvas.clear();
 		canvas.setFont(TGUIManager.guiFont);
 		canvas.setColor(new Color(0, 0, 0));
-		canvas.draw(new Rectangle(1, 1, width - 1, height - 1));
-		typos = height / 2 - (TGUIManager.guiFont.getHeight(text) / 2) - 2;
+		canvas.drawRect(0, 0, size.width - 1, size.height - 1);
+		typos = size.height / 2 - (TGUIManager.guiFont.getHeight(text) / 2) - 2;
 		if (isActive())
-			canvas.drawString("_", TGUIManager.guiFont.getWidth(position.get() < text.length() ? text.substring(0, position.get()) : text), typos + 2);
+			canvas.drawString("_", TGUIManager.guiFont.getWidth(tPosition.get() < text.length() ? text.substring(0, tPosition.get()) : text), typos + 2);
 		canvas.drawString(text, 3, typos);
 		canvas.flush();
 	}
@@ -117,20 +116,20 @@ public class TTextBox extends TGUIComponent
 				{
 					if (TGUIManager.guiInput.isKeyDown(Input.KEY_BACK))
 					{
-						if (position.get() - 1 > -1)
+						if (tPosition.get() - 1 > -1)
 						{
 							oldText = text;
-							text = new StringBuffer(text).deleteCharAt(position.get() - 1).toString();
-							position.left();
+							text = new StringBuffer(text).deleteCharAt(tPosition.get() - 1).toString();
+							tPosition.left();
 							changed = true;
 						}
 					}
 					else if (TGUIManager.guiInput.isKeyDown(Input.KEY_DELETE))
 					{
-						if (position.get() < text.length())
+						if (tPosition.get() < text.length())
 						{
 							oldText = text;
-							text = new StringBuffer(text).deleteCharAt(position.get()).toString();
+							text = new StringBuffer(text).deleteCharAt(tPosition.get()).toString();
 							changed = true;
 						}
 					}
@@ -142,12 +141,12 @@ public class TTextBox extends TGUIComponent
 				{
 					if (TGUIManager.guiInput.isKeyDown(Input.KEY_LEFT))
 					{
-						position.left();
+						tPosition.left();
 						changed = true;
 					}
 					else if (TGUIManager.guiInput.isKeyDown(Input.KEY_RIGHT))
 					{
-						position.right();
+						tPosition.right();
 						changed = true;
 					}
 				}
@@ -177,8 +176,8 @@ public class TTextBox extends TGUIComponent
 			e.printStackTrace();
 		}
 
-		if (visible && graphic.getAlpha() > 0.00F)
-			g.drawImage(graphic, gx, gy);
+		if (visible && alpha > 0.00F)
+			g.drawImage(graphic, screenPos.x, screenPos.y);
 	}
 	
 	public void mousePressed(int button, int x, int y)
@@ -196,9 +195,9 @@ public class TTextBox extends TGUIComponent
 				}
 			}
 			
-			if (mouseClick != null)
+			if (mousePress != null)
 			{
-				mouseClick.execute(button, x, y, this);
+				mousePress.execute(button, x, y, this);
 				changed = true;
 			}
 		}
@@ -222,11 +221,11 @@ public class TTextBox extends TGUIComponent
 				if (c >= 32 && c <= 126)
 				{
 					int w = TGUIManager.guiFont.getWidth(text + Character.toString(c));
-					if (w < width - 4)
+					if (w < size.width - 4)
 					{
 						oldText = text;
-						text = new StringBuffer(text).insert(position.get(), c).toString();
-						position.right();
+						text = new StringBuffer(text).insert(tPosition.get(), c).toString();
+						tPosition.right();
 						changed = true;
 					}
 				}
@@ -238,11 +237,11 @@ public class TTextBox extends TGUIComponent
 					
 					if (!text.isEmpty())
 					{
-						if (position.get() - 1 > -1)
+						if (tPosition.get() - 1 > -1)
 						{
 							oldText = text;
-							text = new StringBuffer(text).deleteCharAt(position.get() - 1).toString();
-							position.left();
+							text = new StringBuffer(text).deleteCharAt(tPosition.get() - 1).toString();
+							tPosition.left();
 							changed = true;
 						}
 					}
@@ -254,10 +253,10 @@ public class TTextBox extends TGUIComponent
 					
 					if (!text.isEmpty())
 					{
-						if (position.get() < text.length())
+						if (tPosition.get() < text.length())
 						{
 							oldText = text;
-							text = new StringBuffer(text).deleteCharAt(position.get()).toString();
+							text = new StringBuffer(text).deleteCharAt(tPosition.get()).toString();
 							changed = true;
 						}
 					}
@@ -299,14 +298,14 @@ public class TTextBox extends TGUIComponent
 				else if (key == Input.KEY_LEFT)
 				{
 					arrowtime.start();
-					position.left();
+					tPosition.left();
 					arrowdown = true;
 					changed = true;
 				}
 				else if (key == Input.KEY_RIGHT)
 				{
 					arrowtime.start();
-					position.right();
+					tPosition.right();
 					arrowdown = true;
 					changed = true;
 				}
@@ -326,16 +325,6 @@ public class TTextBox extends TGUIComponent
 			arrowdown = false;
 	}
 	
-	public void onMouseClick(TGUIClickedEvent function)
-	{
-		mouseClick = function;
-	}
-	
-	public void onMouseOver(TGUIMouseOverEvent function)
-	{
-		mouseOver = function;
-	}
-	
 	public void onTextChange(TGUITextEvent function)
 	{
 		textChange = function;
@@ -350,8 +339,8 @@ public class TTextBox extends TGUIComponent
 	{
 		oldText = text;
 		this.text = text;
-		if (position.get() > text.length())
-			position.set(text.length());
+		if (tPosition.get() > text.length())
+			tPosition.set(text.length());
 		changed = true;
 	}
 	
@@ -363,16 +352,16 @@ public class TTextBox extends TGUIComponent
 	public void clear()
 	{
 		text = "";
-		position.set(0);
+		tPosition.set(0);
 	}
 	
 	private class Position
 	{
-		int position;
-		public void set(int i) { position = i; }
-		public void left() { position = position - 1 > -1 ? position - 1 : 0; }
-		public void right() { position = position + 1 < text.length() + 1 ? position + 1 : text.length(); }
-		public int get() { return position; }
+		int tPosition;
+		public void set(int i) { tPosition = i; }
+		public void left() { tPosition = tPosition - 1 > -1 ? tPosition - 1 : 0; }
+		public void right() { tPosition = tPosition + 1 < text.length() + 1 ? tPosition + 1 : text.length(); }
+		public int get() { return tPosition; }
 	}
 	
 	private class Time

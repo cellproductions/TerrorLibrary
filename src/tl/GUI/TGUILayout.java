@@ -3,6 +3,7 @@ package tl.GUI;
 import java.util.LinkedList;
 
 import tl.Util.TPoint;
+import tl.Util.TSize;
 
 /**
  * TGUIView is an abstract class that provides the basic functionality for TGUIVerticalView and TGUIHorizontalView.<br>
@@ -16,7 +17,7 @@ import tl.Util.TPoint;
 public abstract class TGUILayout extends TGUIObject
 {
 	/**
-	 * The spacing in pixels between each component.
+	 * The spacing in pixels between each component. 3 by default.
 	 * @see #setSpacing(int)
 	 */
 	protected int space;
@@ -28,46 +29,42 @@ public abstract class TGUILayout extends TGUIObject
 	/**
 	 * The layout's parent. If set to null, the layout uses the TGUIManager's properties instead.
 	 * @see #TGUIView(TGUIComponent, boolean)
-	 * @see #setParent(TGUIComponent)
+	 * @see #setParent(TGUIObject)
 	 */
-	protected TGUIComponent parent;
+	protected TGUIObject parent;
 	/**
 	 * The layout's collection of components.
 	 * @see #clear()
-	 * @see #getSize()
 	 */
-	protected LinkedList<TGUIComponent> components;
+	protected LinkedList<TGUIObject> components;
 	/**
 	 * Whether or not the layout should re-organise every time a new component is added.
 	 * @see #TGUIView(TGUIComponent, boolean)
-	 * @see #addComponent(TGUIComponent)
+	 * @see #addComponent(TGUIObject)
 	 */
 	boolean organiseOnAdd;
-	/**
-	 * The position, if any, that the layout should start from in the parent.
-	 */
-	TPoint position;
 	
 	/**
 	 * TGUIView's constructor. Used to set its parent on construction.
 	 * @param parent - The parent of this TGUIView. Can be set to null.
 	 * @param onAdd - Whether or not the layout should re-organise every time a new component is added (true re-organises on add).
-	 * @see #addComponent(TGUIComponent)
+	 * @see #addComponent(TGUIObject)
 	 */
-	public TGUILayout(TGUIComponent parent, boolean onAdd)
+	public TGUILayout(TGUIObject parent, boolean onAdd)
 	{
 		this.parent = parent;
 		components = new LinkedList<>();
 		space = 3;
 		organiseOnAdd = onAdd;
 		position = new TPoint();
+		size = new TSize();
 	}
 	
 	/**
 	 * Sets the parent of the layout. This will re-organise each component.
 	 * @param parent - The parent of this TGUIView. Can be set to null.
 	 */
-	public void setParent(TGUIComponent parent)
+	public void setParent(TGUIObject parent)
 	{
 		this.parent = parent;
 	}
@@ -77,20 +74,21 @@ public abstract class TGUILayout extends TGUIObject
 	 * It will throw a TGUIException if component is null (note that is actually catches its own throw, but it will still exit the application gracefully).
 	 * @param component - The component to add. It must not be null.
 	 */
-	public void addComponent(TGUIComponent component)
+	public void addComponent(TGUIObject component)
 	{
 		try
 		{
 			if (component == null)
 				throw new TGUIException("component is NULL!");
+			
+			components.add(component);
+			if (organiseOnAdd)
+				pOrganise();
 		}
 		catch (TGUIException e)
 		{
 			e.printStackTrace();
 		}
-		components.add(component);
-		if (organiseOnAdd)
-			pOrganise();
 	}
 	
 	/**
@@ -98,21 +96,44 @@ public abstract class TGUILayout extends TGUIObject
 	 * It will throw a TGUIException if a component is null (note that is actually catches its own throw, but it will still exit the application gracefully).
 	 * @param components - The components to add. None of them should be null.
 	 */
-	public void addComponent(TGUIComponent ... components)
+	public void addComponent(TGUIObject ... components)
 	{
 		try
 		{
-			for (TGUIComponent component : components)
+			for (TGUIObject component : components)
 			{
 				if (component == null)
 					throw new TGUIException("component is NULL!");
-				else
-				{
-					this.components.add(component);
-					if (organiseOnAdd)
-						pOrganise();
-				}
+				
+				this.components.add(component);
+				if (organiseOnAdd)
+					pOrganise();
 			}
+		}
+		catch (TGUIException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Adds a component to the layout to be organised at an index.<br>
+	 * It will throw a TGUIException if component is null (note that is actually catches its own throw, but it will still exit the application gracefully).
+	 * @param component - The component to add. It must not be null.
+	 * @param index - The index to insert the component at.
+	 */
+	public void addComponent(TGUIObject component, int index)
+	{
+		try
+		{
+			if (component == null)
+				throw new TGUIException("component is NULL!");
+			if (index < 0 || index >= components.size())
+				throw new TGUIException("index " + index + " out of bounds! [" + components.size() + "]");
+			
+			components.add(index, component);
+			if (organiseOnAdd)
+				pOrganise();
 		}
 		catch (TGUIException e)
 		{
@@ -133,15 +154,6 @@ public abstract class TGUILayout extends TGUIObject
 	public void organise()
 	{
 		pOrganise();
-	}
-	
-	/**
-	 * Sets the starting position on the parent to begin organising from (0, 0 by default).
-	 * @param position - The new position.
-	 */
-	public void setPosition(TPoint position)
-	{
-		this.position.set(position);
 	}
 	
 	/**
@@ -169,7 +181,27 @@ public abstract class TGUILayout extends TGUIObject
 	}
 	
 	/**
+	 * Toggles organising the children upon adding them to the layout.
+	 * @see #isOrganisingOnAdd()
+	 */
+	public void toggleOrganiseAdd()
+	{
+		organiseOnAdd = !organiseOnAdd;
+	}
+	
+	/**
+	 * Used to check if the layout is organising upon adding children.
+	 * @return - True if the layout is organising upon adding children.
+	 * @see #toggleOrganiseAdd()
+	 */
+	public boolean isOrganisingOnAdd()
+	{
+		return organiseOnAdd;
+	}
+	
+	/**
 	 * Toggles component stretching off and on (off by default).
+	 * @see #isStretching()
 	 */
 	public void toggleStretching()
 	{
@@ -177,9 +209,19 @@ public abstract class TGUILayout extends TGUIObject
 	}
 	
 	/**
+	 * Used to tell whether or not the layout has stretching turned on.
+	 * @return - True if the layout is stretching its objects.
+	 * @see #toggleStretching()
+	 */
+	public boolean isStretching()
+	{
+		return stretch;
+	}
+	
+	/**
 	 * @return - Returns the number of components in the layout.
 	 */
-	public int getSize()
+	public int childCount()
 	{
 		return components.size();
 	}
@@ -190,5 +232,25 @@ public abstract class TGUILayout extends TGUIObject
 	public void clear()
 	{
 		components.clear();
+	}
+	
+	/**
+	 * Used by inheriting layout objects. 
+	 * @return - The size of the parent object, depending on whether or not it is null.
+	 */
+	protected TSize getParentSize()
+	{
+		return new TSize(parent == null ? new TSize(TGUIManager.screenWidth, TGUIManager.screenHeight) : parent.getSize());
+	}
+	
+	/**
+	 * Used by inheriting layout objects.
+	 * @param parentSize - Size of the parent.
+	 * @param direction - Direction to organise, vertical or horizontal.
+	 * @return - The size that each child must be if stretching is turned on, otherwise, 0.
+	 */
+	protected int childSizes(TSize parentSize, TEDirection direction) // total size each object must be to fit into the parent if stretching is on
+	{
+		return (int)Math.ceil((float)((direction == TEDirection.TopToBottom ? parentSize.height : parentSize.width) - ((components.size() + 1) * space)) / (float)components.size());
 	}
 }

@@ -2,7 +2,7 @@ package tl.GUI;
 
 public interface TIGUICollection extends TIGUISelectable, TIGUIScrollable
 {
-	public void sort(TSortDirection direction);
+	public void sort(TESortDirection direction);
 	public boolean isEmpty();
-	public int getSize();
+	public int itemCount();
 }

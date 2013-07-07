@@ -18,16 +18,16 @@ public class TListBoxGen<T> extends TListBox
 		type = ComponentType.listBoxGen;
 	}
 	
-	public TListBoxGen(TGUIComponent parent, float x, float y, int w, int h) throws SlickException
+	public TListBoxGen(TGUIComponent parent, float x, float y, int width, int height) throws SlickException
 	{
-		super(parent, x, y, w, h);
+		super(parent, x, y, width, height);
 		type = ComponentType.listBoxGen;
 		items = new ArrayList<Item>();
 	}
 	
-	public TListBoxGen(TGUIComponent parent, float x, float y, int w, int h, int index) throws SlickException
+	public TListBoxGen(TGUIComponent parent, float x, float y, int width, int height, int index) throws SlickException
 	{
-		super(parent, x, y, w, h, index);
+		super(parent, x, y, width, height, index);
 		type = ComponentType.listBoxGen;
 		items = new ArrayList<Item>();
 	}
@@ -37,7 +37,7 @@ public class TListBoxGen<T> extends TListBox
 		canvas = graphic.getGraphics();
 		canvas.clear();
 		canvas.setColor(TGUIManager.BLACK);
-		canvas.drawRect(0, 0, width - 1, height - 1);
+		canvas.drawRect(0, 0, size.width - 1, size.height - 1);
 		canvas.setFont(TGUIManager.guiFont);
 		if (parent.getType() == ComponentType.component)
 			background = parent.background;
@@ -46,7 +46,7 @@ public class TListBoxGen<T> extends TListBox
 
 		for (int i = 0; i < numItems; i++) // this could probably be optimized
 		{
-			if (fontHeight * i + fontHeight < height)
+			if (fontHeight * i + fontHeight < size.height)
 			{
 				toobig = false;
 				if (numDown + i < numItems)
@@ -54,10 +54,10 @@ public class TListBoxGen<T> extends TListBox
 					canvas.setColor(TGUIManager.BLACK);
 					if (numDown + i == selected) // draw the black box underneath the text if selected
 					{
-						canvas.fillRect(1, i * (height / (height / fontHeight)) + 3, width - 15, fontHeight + 2);
+						canvas.fillRect(1, i * (size.height / (size.height / fontHeight)) + 3, size.width - 15, fontHeight + 2);
 						canvas.setColor(background != null ? background : TGUIManager.LISTBOX_BACKGROUND);
 					}
-					canvas.drawString(items.get(i + numDown).text, 3, i * (height / (height / fontHeight)));
+					canvas.drawString(items.get(i + numDown).text, 3, i * (size.height / (size.height / fontHeight)));
 				}
 			}
 			else
@@ -70,17 +70,17 @@ public class TListBoxGen<T> extends TListBox
 		if (toobig)
 		{
 			canvas.setColor(TGUIManager.BLACK);
-			canvas.drawLine(width - 13, height / 2, width - 1, height / 2);
-			canvas.drawLine(width - 14, 1, width - 14, height);
+			canvas.drawLine(size.width - 13, size.height / 2, size.width - 1, size.height / 2);
+			canvas.drawLine(size.width - 14, 1, size.width - 14, size.height);
 			Polygon up = new Polygon();
-			up.addPoint(width - 12, 10);
-			up.addPoint(width - 2, 10);
-			up.addPoint(width - 7, 2);
+			up.addPoint(size.width - 12, 10);
+			up.addPoint(size.width - 2, 10);
+			up.addPoint(size.width - 7, 2);
 			canvas.draw(up);
 			Polygon down = new Polygon();
-			down.addPoint(width - 12, height - 10);
-			down.addPoint(width - 2, height - 10);
-			down.addPoint(width - 7, height - 2);
+			down.addPoint(size.width - 12, size.height - 10);
+			down.addPoint(size.width - 2, size.height - 10);
+			down.addPoint(size.width - 7, size.height - 2);
 			canvas.draw(down);
 			canvas.fill(up);
 			canvas.fill(down);
@@ -112,8 +112,8 @@ public class TListBoxGen<T> extends TListBox
 			e.printStackTrace();
 		}
 
-		if (visible && graphic.getAlpha() > 0.00F)
-			g.drawImage(graphic, gx, gy);
+		if (visible && alpha > 0.00F)
+			g.drawImage(graphic, screenPos.x, screenPos.y);
 	}
 	
 	public boolean isEmpty()
@@ -198,10 +198,10 @@ public class TListBoxGen<T> extends TListBox
 		changed = true;
 	}
 	
-	public void sort(TSortDirection direction)
+	public void sort(TESortDirection direction)
 	{
 		java.util.Collections.sort(items);
-		if (direction == TSortDirection.SORT_HIGHEST)
+		if (direction == TESortDirection.SORT_HIGHEST)
 			java.util.Collections.reverse(items);
 	}
 	

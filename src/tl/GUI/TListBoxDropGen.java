@@ -19,23 +19,23 @@ public class TListBoxDropGen<T> extends TListBoxDrop
 		type = ComponentType.listBoxDropGen;
 	}
 	
-	public TListBoxDropGen(TGUIComponent parent, float x, float y, int w, int h) throws SlickException
+	public TListBoxDropGen(TGUIComponent parent, float x, float y, int width, int height) throws SlickException
 	{
-		super(parent, x, y, w, h);
+		super(parent, x, y, width, height);
 		type = ComponentType.listBoxDropGen;
 		items = new ArrayList<Item>();
 	}
 	
-	public TListBoxDropGen(TGUIComponent parent, float x, float y, int w, int h, int index, Color background) throws SlickException
+	public TListBoxDropGen(TGUIComponent parent, float x, float y, int width, int height, int index, Color background) throws SlickException
 	{
-		super(parent, x, y, w, h);
+		super(parent, x, y, width, height);
 		type = ComponentType.listBoxDropGen;
 		items = new ArrayList<Item>();
 	}
 	
-	public TListBoxDropGen(TGUIComponent parent, float x, float y, int w, int h, int index, Color background, int priority) throws SlickException
+	public TListBoxDropGen(TGUIComponent parent, float x, float y, int width, int height, int index, Color background, int priority) throws SlickException
 	{
-		super(parent, x, y, w, h);
+		super(parent, x, y, width, height);
 		type = ComponentType.listBoxDropGen;
 		items = new ArrayList<Item>();
 	}
@@ -45,13 +45,13 @@ public class TListBoxDropGen<T> extends TListBoxDrop
 		canvas = graphic.getGraphics();
 		canvas.clear();
 		canvas.setColor(TGUIManager.BLACK);
-		canvas.drawRect(0, 0, width - 1, (dropped ? height : defH) - 1); // draw the box outline/background
+		canvas.drawRect(0, 0, size.width - 1, (dropped ? size.height : defH) - 1); // draw the box outline/background
 		canvas.setFont(TGUIManager.guiFont);
 		if (parent.getType() == ComponentType.component)
 			background = parent.background;
 		
 		canvas.setColor(background);
-		canvas.fillRect(1, 1, width - 2, (dropped ? height : defH) - 2);
+		canvas.fillRect(1, 1, size.width - 2, (dropped ? size.height : defH) - 2);
 		
 		int fontHeight = gapHeight - 5;
 
@@ -59,7 +59,7 @@ public class TListBoxDropGen<T> extends TListBoxDrop
 		{
 			for (int i = 0; i < numItems; i++)
 			{
-				if (fontHeight * i + fontHeight < height)
+				if (fontHeight * i + fontHeight < size.height)
 				{
 					toobig = false;
 					if (numDown + i < numItems)
@@ -67,15 +67,15 @@ public class TListBoxDropGen<T> extends TListBoxDrop
 						canvas.setColor(TGUIManager.BLACK);
 						if (numDown + i == selected) // draw the black box underneath the text if selected
 						{
-							canvas.fillRect(1, i * (height / (height / fontHeight)) + 3, width - 15, fontHeight + 2);
+							canvas.fillRect(1, i * (size.height / (size.height / fontHeight)) + 3, size.width - 15, fontHeight + 2);
 							canvas.setColor(newSelected != null ? newSelected : defSelected);
 						}
-						canvas.drawString(items.get(i + numDown).text, 3, i * (height / (height / fontHeight))); // draw the item
+						canvas.drawString(items.get(i + numDown).text, 3, i * (size.height / (size.height / fontHeight))); // draw the item
 					}
 				}
 				else
 				{
-					toobig = true; // height of the number of items in the list is greater than the height of the list itself
+					toobig = true; // size.height of the number of items in the list is greater than the size.height of the list itself
 					i = numItems; // break out of loop
 				}
 			}
@@ -83,17 +83,17 @@ public class TListBoxDropGen<T> extends TListBoxDrop
 			if (toobig) // draw the scroll arrows
 			{
 				canvas.setColor(TGUIManager.BLACK);
-				canvas.drawLine(width - 13, height / 2, width - 1, height / 2);
-				canvas.drawLine(width - 14, 1, width - 14, height);
+				canvas.drawLine(size.width - 13, size.height / 2, size.width - 1, size.height / 2);
+				canvas.drawLine(size.width - 14, 1, size.width - 14, size.height);
 				Polygon up = new Polygon();
-				up.addPoint(width - 12, 10);
-				up.addPoint(width - 2, 10);
-				up.addPoint(width - 7, 2);
+				up.addPoint(size.width - 12, 10);
+				up.addPoint(size.width - 2, 10);
+				up.addPoint(size.width - 7, 2);
 				canvas.draw(up);
 				Polygon down = new Polygon();
-				down.addPoint(width - 12, height - 10);
-				down.addPoint(width - 2, height - 10);
-				down.addPoint(width - 7, height - 2);
+				down.addPoint(size.width - 12, size.height - 10);
+				down.addPoint(size.width - 2, size.height - 10);
+				down.addPoint(size.width - 7, size.height - 2);
 				canvas.draw(down);
 				canvas.fill(up);
 				canvas.fill(down);
@@ -104,7 +104,7 @@ public class TListBoxDropGen<T> extends TListBoxDrop
 			if (numItems > 0)
 			{
 				canvas.setColor(TGUIManager.BLACK);
-				canvas.fillRect(1, 3, width - 15, fontHeight + 2);
+				canvas.fillRect(1, 3, size.width - 15, fontHeight + 2);
 				canvas.setColor(newSelected != null ? newSelected : defSelected);
 				canvas.drawString(items.get(selected > -1 && selected < numItems ? selected : 0).text, 3, 0);
 				if (selected < 0 || selected >= numItems)
@@ -113,16 +113,16 @@ public class TListBoxDropGen<T> extends TListBoxDrop
 			
 			canvas.setColor(TGUIManager.BLACK);
 			Polygon down = new Polygon(); // draw the drop down button
-			down.addPoint(width - 12, 11);
-			down.addPoint(width - 2, 11);
-			down.addPoint(width - 7, 19);
+			down.addPoint(size.width - 12, 11);
+			down.addPoint(size.width - 2, 11);
+			down.addPoint(size.width - 7, 19);
 			canvas.draw(down);
 			canvas.fill(down);
 		}
 		if (TGUIManager.debug)
 		{
 			canvas.setColor(Color.yellow);
-			canvas.drawRect(0, 0, width - 1, height - 1);
+			canvas.drawRect(0, 0, size.width - 1, size.height - 1);
 		}
 		canvas.flush();
 	}
@@ -151,8 +151,8 @@ public class TListBoxDropGen<T> extends TListBoxDrop
 			e.printStackTrace();
 		}
 
-		if (visible && graphic.getAlpha() > 0.00F)
-			g.drawImage(graphic, gx, gy);
+		if (visible && alpha > 0.00F)
+			g.drawImage(graphic, screenPos.x, screenPos.y);
 	}
 	
 	public void addItem(String text, T object)
@@ -237,7 +237,7 @@ public class TListBoxDropGen<T> extends TListBoxDrop
 		toobig = false;
 		selected = -1;
 		if (resizeable)
-			height = defH;
+			size.height = defH;
 		changed = true;
 	}
 	

@@ -11,7 +11,7 @@ import tl.Util.TSize;
  * @see TGUIComponent
  * @see TGUILayout
  */
-public abstract class TGUIObject
+public class TGUIObject
 {
 	/**
 	 * The x and y position of this object.
@@ -21,4 +21,46 @@ public abstract class TGUIObject
 	 * The width and height of this object.
 	 */
 	protected TSize size;
+	
+	public TGUIObject()
+	{
+		position = new TPoint();
+		size = new TSize();
+	}
+	
+	public TGUIObject(TPoint position, TSize size)
+	{
+		this.position = new TPoint(position);
+		this.size = new TSize(size);
+	}
+	
+	public void setPosition(float x, float y)
+	{
+		position.set(x, y);
+	}
+	
+	public void setPosition(TPoint position)
+	{
+		this.position.set(position);
+	}
+	
+	public TPoint getPosition()
+	{
+		return new TPoint(position);
+	}
+	
+	public void setSize(int width, int height)
+	{
+		size.set(width, height);
+	}
+	
+	public void setSize(TSize size)
+	{
+		this.size.set(size);
+	}
+	
+	public TSize getSize()
+	{
+		return new TSize(size);
+	}
 }

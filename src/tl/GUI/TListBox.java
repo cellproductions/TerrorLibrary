@@ -38,18 +38,18 @@ public class TListBox extends TGUIComponent implements TIGUICollection
 		selected = -1;
 	}
 	
-	public TListBox(TGUIComponent parent, float x, float y, int w, int h) throws SlickException
+	public TListBox(TGUIComponent parent, float x, float y, int width, int height) throws SlickException
 	{
-		super(parent, x, y, w, h);
+		super(parent, x, y, width, height);
 		type = ComponentType.listBox;
 		items = new ArrayList<String>();
 		selected = -1;
 		changed = true;
 	}
 
-	public TListBox(TGUIComponent parent, float x, float y, int w, int h, int index) throws SlickException
+	public TListBox(TGUIComponent parent, float x, float y, int width, int height, int index) throws SlickException
 	{
-		super(parent, x, y, w, h);
+		super(parent, x, y, width, height);
 		type = ComponentType.listBox;
 		items = new ArrayList<String>();
 		selected = index;
@@ -58,12 +58,12 @@ public class TListBox extends TGUIComponent implements TIGUICollection
 
 	private void updateLB() throws SlickException
 	{
-		if (graphic == null)
-			graphic = new Image(width, height);
+		if (graphic == TGUIManager.emptyImage)
+			graphic = new Image(size.width, size.height);
 		canvas = graphic.getGraphics();
 		canvas.clear();
 		canvas.setColor(TGUIManager.BLACK);
-		canvas.drawRect(0, 0, width - 1, height - 1);
+		canvas.drawRect(0, 0, size.width - 1, size.height - 1);
 		canvas.setFont(TGUIManager.guiFont);
 		if (parent.getType() == ComponentType.component)
 			background = parent.background;
@@ -72,7 +72,7 @@ public class TListBox extends TGUIComponent implements TIGUICollection
 
 		for (int i = 0; i < numItems; i++) // this could probably be optimized
 		{
-			if (fontHeight * i + fontHeight < height)
+			if (fontHeight * i + fontHeight < size.height)
 			{
 				toobig = false;
 				if (numDown + i < numItems)
@@ -80,10 +80,10 @@ public class TListBox extends TGUIComponent implements TIGUICollection
 					canvas.setColor(TGUIManager.BLACK);
 					if (numDown + i == selected) // draw the black box underneath the text if selected
 					{
-						canvas.fillRect(1, i * (height / (height / fontHeight)) + 3, width - 15, fontHeight + 2);
+						canvas.fillRect(1, i * (size.height / (size.height / fontHeight)) + 3, size.width - 15, fontHeight + 2);
 						canvas.setColor(background != null ? background : TGUIManager.LISTBOX_BACKGROUND);
 					}
-					canvas.drawString(items.get(i + numDown), 3, i * (height / (height / fontHeight)));
+					canvas.drawString(items.get(i + numDown), 3, i * (size.height / (size.height / fontHeight)));
 				}
 			}
 			else
@@ -96,17 +96,17 @@ public class TListBox extends TGUIComponent implements TIGUICollection
 		if (toobig)
 		{
 			canvas.setColor(TGUIManager.BLACK);
-			canvas.drawLine(width - 13, height / 2, width - 1, height / 2);
-			canvas.drawLine(width - 14, 1, width - 14, height);
+			canvas.drawLine(size.width - 13, size.height / 2, size.width - 1, size.height / 2);
+			canvas.drawLine(size.width - 14, 1, size.width - 14, size.height);
 			Polygon up = new Polygon();
-			up.addPoint(width - 12, 10);
-			up.addPoint(width - 2, 10);
-			up.addPoint(width - 7, 2);
+			up.addPoint(size.width - 12, 10);
+			up.addPoint(size.width - 2, 10);
+			up.addPoint(size.width - 7, 2);
 			canvas.draw(up);
 			Polygon down = new Polygon();
-			down.addPoint(width - 12, height - 10);
-			down.addPoint(width - 2, height - 10);
-			down.addPoint(width - 7, height - 2);
+			down.addPoint(size.width - 12, size.height - 10);
+			down.addPoint(size.width - 2, size.height - 10);
+			down.addPoint(size.width - 7, size.height - 2);
 			canvas.draw(down);
 			canvas.fill(up);
 			canvas.fill(down);
@@ -138,8 +138,8 @@ public class TListBox extends TGUIComponent implements TIGUICollection
 			e.printStackTrace();
 		}
 
-		if (visible && graphic.getAlpha() > 0.00F)
-			g.drawImage(graphic, gx, gy);
+		if (visible && alpha > 0.00F)
+			g.drawImage(graphic, screenPos.x, screenPos.y);
 	}
 	
 	public void onSelectionChange(TGUISelectionEvent function)
@@ -159,12 +159,12 @@ public class TListBox extends TGUIComponent implements TIGUICollection
 				{
 					if (toobig)
 					{
-						if (y - gy < height / 2 && y - gy >= 0 && numDown - 1 >= 0)
+						if (y - screenPos.y < size.height / 2 && y - screenPos.y >= 0 && numDown - 1 >= 0)
 						{
 							numDown--;
 							changed = true;
 						}
-						if (y - gy >= height / 2 && y - gy < height && numDown < numItems - visibleItems())
+						if (y - screenPos.y >= size.height / 2 && y - screenPos.y < size.height && numDown < numItems - visibleItems())
 						{
 							numDown++;
 							changed = true;
@@ -175,16 +175,16 @@ public class TListBox extends TGUIComponent implements TIGUICollection
 				{
 					try
 					{
-						int where = getIndexFromCoordinates(x - gx, y - gy); // place here instead of in setSelected() so that exception isnt thrown in mid call
+						int where = getIndexFromCoordinates(x - screenPos.x, y - screenPos.y); // place here instead of in setSelected() so that exception isnt thrown in mid call
 						setSelected(where);
 					}
 					catch (TGUIException e) {} // do nothing in this case
 				}
 			}
 			
-			if (mouseClick != null) // mouseIsOver() is already checked at the top
+			if (mousePress != null) // mouseIsOver() is already checked at the top
 			{
-				mouseClick.execute(button, x, y, this);
+				mousePress.execute(button, x, y, this);
 				changed = true;
 			}
 		}
@@ -215,16 +215,16 @@ public class TListBox extends TGUIComponent implements TIGUICollection
 	
 	protected boolean mouseIsWithinScroll()
 	{
-		int x = (int)(TCursor.getX() - gx);
-		int y = (int)(TCursor.getY() - gy);
-		return x >= width - 12 && x < width - 2 && y >= 0 && y < height;
+		int x = (int)(TCursor.getX() - screenPos.x);
+		int y = (int)(TCursor.getY() - screenPos.y);
+		return x >= size.width - 12 && x < size.width - 2 && y >= 0 && y < size.height;
 	}
 	
 	public int getIndexFromCoordinates(float xx, float yy) throws TGUIException
 	{
 		int where = (int)((yy) / gapHeight) + numDown;
 		if (where >= numItems || !mouseIsOverItem())
-			throw new TGUIException("coordinates " + x + "," + y + " do not match any index!");
+			throw new TGUIException("coordinates " + position.x + "," + position.y + " do not match any index!");
 		return where;
 	}
 	
@@ -305,7 +305,7 @@ public class TListBox extends TGUIComponent implements TIGUICollection
 		int fontHeight = gapHeight - 5;
 		if (numItems >= 0)
 		{
-			if (fontHeight * numItems >= height)
+			if (fontHeight * numItems >= size.height)
 			{
 				if (numDown < numItems - visibleItems())
 				{
@@ -321,7 +321,7 @@ public class TListBox extends TGUIComponent implements TIGUICollection
 		int fontHeight = gapHeight - 5;
 		if (numItems >= 0)
 		{
-			if (fontHeight * numItems >= height)
+			if (fontHeight * numItems >= size.height)
 			{
 				if (numDown - 1 >= 0)
 				{
@@ -334,7 +334,7 @@ public class TListBox extends TGUIComponent implements TIGUICollection
 	
 	public int visibleItems() // returns the number of visible items in the list, not very accurate, fix
 	{
-		return height / (gapHeight - 5);
+		return size.height / (gapHeight - 5);
 	}
 
 	public String getText(int index) throws TGUIException
@@ -344,10 +344,10 @@ public class TListBox extends TGUIComponent implements TIGUICollection
 		return items.get(index);
 	}
 	
-	public void sort(TSortDirection direction)
+	public void sort(TESortDirection direction)
 	{
 		java.util.Collections.sort(items);
-		if (direction == TSortDirection.SORT_HIGHEST)
+		if (direction == TESortDirection.SORT_HIGHEST)
 			java.util.Collections.reverse(items);
 	}
 
@@ -361,7 +361,7 @@ public class TListBox extends TGUIComponent implements TIGUICollection
 		changed = true;
 	}
 
-	public int getSize()
+	public int itemCount()
 	{
 		return numItems;
 	}

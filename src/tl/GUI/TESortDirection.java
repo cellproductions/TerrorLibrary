@@ -1,6 +1,6 @@
 package tl.GUI;
 
-public enum TSortDirection
+public enum TESortDirection
 {
 	SORT_HIGHEST, SORT_LOWEST;
 }

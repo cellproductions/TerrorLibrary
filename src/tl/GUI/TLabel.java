@@ -34,18 +34,18 @@ public class TLabel extends TGUIComponent
 		text = "";
 	}
 
-	public TLabel(TGUIComponent parent, float x, float y, int w, int h, String t) throws SlickException
+	public TLabel(TGUIComponent parent, float x, float y, int width, int height, String t) throws SlickException
 	{
-		super(parent, x, y, w, h);
+		super(parent, x, y, width, height);
 		type = ComponentType.label;
 		position = TTriBool.TRUE;
 		text = t;
 		changed = true;
 	}
 	
-	public TLabel(TGUIComponent parent, float x, float y, int w, int h, String t, byte position) throws SlickException
+	public TLabel(TGUIComponent parent, float x, float y, int width, int height, String t, byte position) throws SlickException
 	{
-		this(parent, x, y, w, h, t);
+		this(parent, x, y, width, height, t);
 		try
 		{
 			this.position = TTriBool.parseTriBool(position);
@@ -85,13 +85,13 @@ public class TLabel extends TGUIComponent
 		
 		for (Split split : brackets) // go through the new lines, create new lines depending on wrapping, store them in list
 		{
-			if (TGUIManager.guiFont.getWidth(split.line) >= width) // check the final part, is it greater than the width?
+			if (TGUIManager.guiFont.getWidth(split.line) >= size.width) // check the final part, is it greater than the width?
 			{
 				String cut[] = split.line.split(" ");
 				String word = new String();
 				for (String n : cut)
 				{
-					if (TGUIManager.guiFont.getWidth(word + " " + n) < width)
+					if (TGUIManager.guiFont.getWidth(word + " " + n) < size.width)
 						word += n + " ";
 					else
 					{
@@ -111,8 +111,8 @@ public class TLabel extends TGUIComponent
 		LinkedList<Split> list = new LinkedList<Split>();
 		fillListWithLines(list);
 		
-		if (graphic == null)
-			graphic = new Image(width, height);
+		if (graphic == TGUIManager.emptyImage)
+			graphic = new Image(size.width, size.height);
 		canvas = graphic.getGraphics();
 		canvas.clear();
 		canvas.setFont(TGUIManager.guiFont);
@@ -120,14 +120,14 @@ public class TLabel extends TGUIComponent
 		int i = 0;
 		for (Split s : list) // draw it in the position decided by 'position'
 		{
-			canvas.drawString(s.line, position == TTriBool.TRUE ? 0 : (position == TTriBool.FALSE ? width - s.w - 1 : (width / 2) - (s.w / 2)), i * 24);
+			canvas.drawString(s.line, position == TTriBool.TRUE ? 0 : (position == TTriBool.FALSE ? size.width - s.w - 1 : (size.width / 2) - (s.w / 2)), i * 24);
 			++i;
 		}
 
 		if (TGUIManager.debug)
 		{
 			canvas.setColor(Color.yellow);
-			canvas.drawRect(0, 0, width - 1, height - 1);
+			canvas.drawRect(0, 0, size.width - 1, size.height - 1);
 		}
 		canvas.flush();
 	}
@@ -146,8 +146,8 @@ public class TLabel extends TGUIComponent
 		{
 			e.printStackTrace();
 		}
-		if (visible && graphic.getAlpha() > 0.00F)
-			g.drawImage(graphic, gx, gy);
+		if (visible && alpha > 0.00F)
+			g.drawImage(graphic, screenPos.x, screenPos.y);
 	}
 	
 	public void mousePressed(int button, int x, int y)
@@ -156,17 +156,26 @@ public class TLabel extends TGUIComponent
 		{
 			if (!mouseIsOver())
 				return;
-			if (mouseClick != null)
+			if (mousePress != null)
 			{
-				mouseClick.execute(button, x, y, this);
+				mousePress.execute(button, x, y, this);
 				changed = true;
 			}
 		}
 	}
 	
-	public void onMouseClick(TGUIClickedEvent function)
+	public void mouseReleased(int button, int x, int y)
 	{
-		mouseClick = function;
+		if (enabled)
+		{
+			if (!mouseIsOver())
+				return;
+			if (mouseRelease != null)
+			{
+				mouseRelease.execute(button, x, y, this);
+				changed = true;
+			}
+		}
 	}
 	
 	public void onTextChange(TGUITextEvent function)

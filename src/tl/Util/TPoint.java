@@ -125,7 +125,7 @@ public class TPoint
 	 * @param width - Width of a row in the 2D array
 	 * @param px - Index x
 	 * @return - The 1D index
-	 * @see #get2DIndex(int, int, int)
+	 * @see #get2DIndex(int, int)
 	 */
 	public static int get1DIndex(int py, int width, int px)
 	{

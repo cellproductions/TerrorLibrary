@@ -31,19 +31,19 @@ public class TSlider extends TGUIComponent
 		type = ComponentType.slider;
 	}
 
-	public TSlider(TGUIComponent parent, float x, float y, int w, int h, int ma, int mi, int v) throws SlickException
+	public TSlider(TGUIComponent parent, float x, float y, int width, int height, int max, int min, int v) throws SlickException
 	{
-		super(parent, x, y, w, h);
+		super(parent, x, y, width, height);
 		type = ComponentType.slider;
-		max = ma;
-		min = mi;
+		this.max = max;
+		this.min = min;
 		value = v;
 		changed = true;
 	}
 
 	public boolean mouseIsOver()
 	{
-		return TCursor.getX() >= gx + 4 && TCursor.getX() <= gx + width && TCursor.getY() >= gy && TCursor.getY() <= gy + height;
+		return TCursor.getX() >= screenPos.x + 4 && TCursor.getX() <= screenPos.x + size.width && TCursor.getY() >= screenPos.y && TCursor.getY() <= screenPos.y + size.height;
 	}
 	
 	private float valuex;
@@ -51,10 +51,10 @@ public class TSlider extends TGUIComponent
 
 	private void updateSlider() throws SlickException
 	{
-		if (graphic == null)
+		if (graphic == TGUIManager.emptyImage)
 		{
-			int w = width - xOffSet;
-			int h = height;
+			int w = size.width - xOffSet;
+			int h = size.height;
 			box = new Image(w, h);
 			canvas = box.getGraphics();
 			canvas.setColor(TGUIManager.BLACK);
@@ -81,8 +81,8 @@ public class TSlider extends TGUIComponent
 			canvas.drawLine(1, h - 2, w - 1, h - 2);
 			canvas.flush();
 			
-			float fWidth = width - xOffSet * 2, fMax = max, fValue = value, fMin = min;
-			graphic = new Image(width + xOffSet * 2, h);
+			float fWidth = size.width - xOffSet * 2, fMax = max, fValue = value, fMin = min;
+			graphic = new Image(size.width + xOffSet * 2, h);
 			canvas = graphic.getGraphics();
 			canvas.drawImage(box, xOffSet, h / 2 - (box.getHeight() / 2));
 			valuex = (fWidth * (fValue - fMin)) / (fMax - fMin); // thanks wolframalpha
@@ -102,7 +102,7 @@ public class TSlider extends TGUIComponent
 		if (TGUIManager.debug)
 		{
 			canvas.setColor(Color.yellow);
-			canvas.drawRect(0, 0, width - 1, height - 1);
+			canvas.drawRect(0, 0, size.width - 1, size.height - 1);
 		}
 		canvas.flush();
 	}
@@ -120,10 +120,10 @@ public class TSlider extends TGUIComponent
 		
 		if (pressing)
 		{
-			valuex = TCursor.getX() - gx;
-			int offset = (valuex <= width / 2 ? slide.getWidth() / 2 : 0);
+			valuex = TCursor.getX() - screenPos.x;
+			int offset = (valuex <= size.width / 2 ? slide.getWidth() / 2 : 0);
 			valuex -= offset;
-			long check = Math.round((valuex * (max - min)) / width) + min;
+			long check = Math.round((valuex * (max - min)) / size.width) + min;
 			if (check >= min && check <= max)
 			{
 				value = check;
@@ -145,25 +145,23 @@ public class TSlider extends TGUIComponent
 		{
 			e.printStackTrace();
 		}
-		if (visible && graphic.getAlpha() > 0.00F)
-			g.drawImage(graphic, gx, gy);
+		if (visible && alpha > 0.00F)
+			g.drawImage(graphic, screenPos.x, screenPos.y);
 	}
 	
 	public void mousePressed(int button, int x, int y)
 	{
 		if (enabled)
 		{
-			boolean mover = mouseIsOver();
+			if (!mouseIsOver())
+				return;
+			
 			if (button == 0)
-				if (mover)
-					pressing = true;
-			if (mover)
+				pressing = true;
+			if (mousePress != null)
 			{
-				if (mouseClick != null)
-				{
-					mouseClick.execute(button, x, y, this);
-					changed = true;
-				}
+				mousePress.execute(button, x, y, this);
+				changed = true;
 			}
 		}
 	}
@@ -172,15 +170,17 @@ public class TSlider extends TGUIComponent
 	{
 		if (enabled)
 		{
+			if (!mouseIsOver())
+				return;
 			if (button == 0)
 			{
 				if (pressing)
 				{
 					pressing = false;
-					valuex = TCursor.getX() - gx;
-					int offset = (valuex <= width / 2 ? slide.getWidth() / 2 : 0);
+					valuex = TCursor.getX() - screenPos.x;
+					int offset = (valuex <= size.width / 2 ? slide.getWidth() / 2 : 0);
 					valuex -= offset;
-					long check = Math.round((valuex * (max - min)) / width) + min;
+					long check = Math.round((valuex * (max - min)) / size.width) + min;
 					if (check >= min && check <= max)
 					{
 						value = check;
@@ -195,17 +195,12 @@ public class TSlider extends TGUIComponent
 					}
 				}
 			}
+			if (mouseRelease != null)
+			{
+				mouseRelease.execute(button, x, y, this);
+				changed = true;
+			}
 		}
-	}
-	
-	public void onMouseClick(TGUIClickedEvent function)
-	{
-		mouseClick = function;
-	}
-	
-	public void onMouseOver(TGUIMouseOverEvent function)
-	{
-		mouseOver = function;
 	}
 	
 	public void onValueChange(TGUIValueEvent function)
@@ -213,7 +208,7 @@ public class TSlider extends TGUIComponent
 		valueChange = function;
 	}
 	
-	public void onMouseReleased(TGUIValueEvent function)
+	public void onFinalValueChange(TGUIValueEvent function) // when the user releases button 0
 	{
 		valueFinal = function;
 	}

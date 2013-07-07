@@ -31,21 +31,21 @@ public class TListBoxDrop extends TListBox
 		priority = 1; // higher priority over other types more likely
 	}
 	
-	public TListBoxDrop(TGUIComponent parent, float x, float y, int w, int h) throws SlickException
+	public TListBoxDrop(TGUIComponent parent, float x, float y, int width, int height) throws SlickException
 	{
-		super(parent, x, y, w, h);
+		super(parent, x, y, width, height);
 		type = ComponentType.listBoxDrop;
-		normalHeight = h;
+		normalHeight = height;
 		if (normalHeight < defH)
 			defH = normalHeight;
 		priority = 1;
 	}
 	
-	public TListBoxDrop(TGUIComponent parent, float x, float y, int w, int h, int index) throws SlickException
+	public TListBoxDrop(TGUIComponent parent, float x, float y, int width, int height, int index) throws SlickException
 	{
-		super(parent, x, y, w, h, index);
+		super(parent, x, y, width, height, index);
 		type = ComponentType.listBoxDrop;
-		normalHeight = h;
+		normalHeight = height;
 		if (normalHeight < defH)
 			defH = normalHeight;
 		priority = 1;
@@ -68,33 +68,33 @@ public class TListBoxDrop extends TListBox
 		if (resizeable)
 			resize();
 		else
-			height = normalHeight;
+			size.height = normalHeight;
 		changed = true;
 	}
 	
 	protected void resize()
 	{
-		int size = (int)(defH * numItems - gy);
+		int size = (int)(defH * numItems - screenPos.y);
 		if (size <= TGUIManager.screenHeight - 1 && defH * numItems >= defH)
-			height = (defH - 5) * numItems;
+			this.size.height = (defH - 5) * numItems;
 		if (defH * numItems < defH)
-			height = defH;
+			this.size.height = defH;
 	}
 	
 	private void updateLBD() throws SlickException
 	{
-		if (graphic == null)
-			graphic = new Image(width, height);
+		if (graphic == TGUIManager.emptyImage)
+			graphic = new Image(size.width, size.height);
 		canvas = graphic.getGraphics();
 		canvas.clear();
 		canvas.setColor(TGUIManager.BLACK);
-		canvas.drawRect(0, 0, width - 1, (dropped ? height : defH) - 1); // draw the box outline/background
+		canvas.drawRect(0, 0, size.width - 1, (dropped ? size.height : defH) - 1); // draw the box outline/background
 		canvas.setFont(TGUIManager.guiFont);
 		if (parent.getType() == ComponentType.component)
 			background = parent.background;
 		
 		canvas.setColor(background);
-		canvas.fillRect(1, 1, width - 2, (dropped ? height : defH) - 2);
+		canvas.fillRect(1, 1, size.width - 2, (dropped ? size.height : defH) - 2);
 		
 		int fontHeight = gapHeight - 5;
 
@@ -102,7 +102,7 @@ public class TListBoxDrop extends TListBox
 		{
 			for (int i = 0; i < numItems; i++)
 			{
-				if (fontHeight * i + fontHeight < height)
+				if (fontHeight * i + fontHeight < size.height)
 				{
 					toobig = false;
 					if (numDown + i < numItems)
@@ -110,10 +110,10 @@ public class TListBoxDrop extends TListBox
 						canvas.setColor(TGUIManager.BLACK);
 						if (numDown + i == selected) // draw the black box underneath the text if selected
 						{
-							canvas.fillRect(1, i * (height / (height / fontHeight)) + 3, width - 15, fontHeight + 2);
+							canvas.fillRect(1, i * (size.height / (size.height / fontHeight)) + 3, size.width - 15, fontHeight + 2);
 							canvas.setColor(newSelected != null ? newSelected : defSelected);
 						}
-						canvas.drawString(items.get(i + numDown), 3, i * (height / (height / fontHeight))); // draw the item
+						canvas.drawString(items.get(i + numDown), 3, i * (size.height / (size.height / fontHeight))); // draw the item
 					}
 				}
 				else
@@ -126,17 +126,17 @@ public class TListBoxDrop extends TListBox
 			if (toobig) // draw the scroll arrows
 			{
 				canvas.setColor(TGUIManager.BLACK);
-				canvas.drawLine(width - 13, height / 2, width - 1, height / 2);
-				canvas.drawLine(width - 14, 1, width - 14, height);
+				canvas.drawLine(size.width - 13, size.height / 2, size.width - 1, size.height / 2);
+				canvas.drawLine(size.width - 14, 1, size.width - 14, size.height);
 				Polygon up = new Polygon();
-				up.addPoint(width - 12, 10);
-				up.addPoint(width - 2, 10);
-				up.addPoint(width - 7, 2);
+				up.addPoint(size.width - 12, 10);
+				up.addPoint(size.width - 2, 10);
+				up.addPoint(size.width - 7, 2);
 				canvas.draw(up);
 				Polygon down = new Polygon();
-				down.addPoint(width - 12, height - 10);
-				down.addPoint(width - 2, height - 10);
-				down.addPoint(width - 7, height - 2);
+				down.addPoint(size.width - 12, size.height - 10);
+				down.addPoint(size.width - 2, size.height - 10);
+				down.addPoint(size.width - 7, size.height - 2);
 				canvas.draw(down);
 				canvas.fill(up);
 				canvas.fill(down);
@@ -147,7 +147,7 @@ public class TListBoxDrop extends TListBox
 			if (numItems > 0)
 			{
 				canvas.setColor(TGUIManager.BLACK);
-				canvas.fillRect(1, 3, width - 15, fontHeight + 2);
+				canvas.fillRect(1, 3, size.width - 15, fontHeight + 2);
 				canvas.setColor(newSelected != null ? newSelected : defSelected);
 				canvas.drawString(items.get(selected > -1 && selected < numItems ? selected : 0), 3, 0);
 				if (selected < 0 || selected >= numItems)
@@ -156,16 +156,16 @@ public class TListBoxDrop extends TListBox
 			
 			canvas.setColor(TGUIManager.BLACK);
 			Polygon down = new Polygon(); // draw the drop down button
-			down.addPoint(width - 12, 11);
-			down.addPoint(width - 2, 11);
-			down.addPoint(width - 7, 19);
+			down.addPoint(size.width - 12, 11);
+			down.addPoint(size.width - 2, 11);
+			down.addPoint(size.width - 7, 19);
 			canvas.draw(down);
 			canvas.fill(down);
 		}
 		if (TGUIManager.debug)
 		{
 			canvas.setColor(Color.yellow);
-			canvas.drawRect(0, 0, width - 1, height - 1);
+			canvas.drawRect(0, 0, size.width - 1, size.height - 1);
 		}
 		canvas.flush();
 	}
@@ -194,8 +194,8 @@ public class TListBoxDrop extends TListBox
 			e.printStackTrace();
 		}
 
-		if (visible && graphic.getAlpha() > 0.00F)
-			g.drawImage(graphic, gx, gy);
+		if (visible && alpha > 0.00F)
+			g.drawImage(graphic, screenPos.x, screenPos.y);
 	}
 	
 	public void mousePressed(int button, int x, int y)
@@ -221,12 +221,12 @@ public class TListBoxDrop extends TListBox
 						{
 							if (toobig)
 							{
-								if (y - gy < height / 2 && y - gy >= 0 && numDown - 1 >= 0)
+								if (y - screenPos.y < size.height / 2 && y - screenPos.y >= 0 && numDown - 1 >= 0)
 								{
 									numDown--;
 									changed = true;
 								}
-								if (y - gy >= height / 2 && y - gy < height && numDown < numItems - visibleItems())
+								if (y - screenPos.y >= size.height / 2 && y - screenPos.y < size.height && numDown < numItems - visibleItems())
 								{
 									numDown++;
 									changed = true;
@@ -245,7 +245,7 @@ public class TListBoxDrop extends TListBox
 						{
 							try
 							{
-								int where = getIndexFromCoordinates(x - gx, y - gy); // place here instead of in setSelected() so that exception isnt thrown in mid call
+								int where = getIndexFromCoordinates(x - screenPos.x, y - screenPos.y); // place here instead of in setSelected() so that exception isnt thrown in mid call
 								setSelected(where);
 								dropped = false;
 							}
@@ -255,9 +255,9 @@ public class TListBoxDrop extends TListBox
 				}
 			}
 			
-			if (mouseClick != null)
+			if (mousePress != null)
 			{
-				mouseClick.execute(button, x, y, this);
+				mousePress.execute(button, x, y, this);
 				changed = true;
 			}
 		}
@@ -267,20 +267,20 @@ public class TListBoxDrop extends TListBox
 	{
 		int where = (int)((yy) / gapHeight) + numDown;
 		if (where >= numItems || !mouseIsOverItem())
-			throw new TGUIException("coordinates " + x + "," + y + " do not match any index!");
+			throw new TGUIException("coordinates " + position.x + "," + position.y + " do not match any index!");
 		return where;
 	}
 	
 	protected boolean mouseIsWithinScroll()
 	{
-		int x = (int)(TCursor.getX() - gx);
-		int y = (int)(TCursor.getY() - gy);
-		return x >= width - 12 && x < width - 2 && y >= 0 && y < (dropped ? height : defH);
+		int x = (int)(TCursor.getX() - screenPos.x);
+		int y = (int)(TCursor.getY() - screenPos.y);
+		return x >= size.width - 12 && x < size.width - 2 && y >= 0 && y < (dropped ? size.height : defH);
 	}
 	
 	public boolean mouseIsOver()
 	{
-		return TCursor.getX() >= gx && TCursor.getX() <= gx + width && TCursor.getY() >= gy && TCursor.getY() <= gy + (dropped ? height : defH) && visible;
+		return TCursor.getX() >= screenPos.x && TCursor.getX() <= screenPos.x + size.width && TCursor.getY() >= screenPos.y && TCursor.getY() <= screenPos.y + (dropped ? size.height : defH) && visible;
 	}
 	
 	public void addItem(String text)
@@ -324,7 +324,7 @@ public class TListBoxDrop extends TListBox
 		{
 			if (dropped)
 			{
-				if (fontHeight * numItems >= height)
+				if (fontHeight * numItems >= size.height)
 				{
 					if (numDown < numItems - visibleItems())
 					{
@@ -343,7 +343,7 @@ public class TListBoxDrop extends TListBox
 		{
 			if (dropped)
 			{
-				if (fontHeight * numItems >= height)
+				if (fontHeight * numItems >= size.height)
 				{
 					if (numDown - 1 >= 0)
 					{
@@ -363,7 +363,7 @@ public class TListBoxDrop extends TListBox
 		toobig = false;
 		selected = -1;
 		if (resizeable)
-			height = defH;
+			size.height = defH;
 		changed = true;
 	}
 }

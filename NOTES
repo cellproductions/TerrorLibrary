@@ -59,10 +59,16 @@ GUIComponents:
 * remove 'priority' method from all base/subclasses
 * make sure that most collection implementing components have synchronized functions in regards to editing their container types (or iterating over them)
 * only allow clicking on a single component, e.g. multiple overlapping components will receive the same mouse click, etc, must be stopped
+* adding a component should set its parent to the component doing the adding
+* instead of checking if graphic == null, create a nullImage image and initialise all graphics with that (0x0 image with nothing in it)
 
 
 GUI:
 * delete? obsolete?
+
+
+GUILayout:
+* putting one layout inside another and organising the other wont really effect the former (besides move it, but the spacing isnt considered), design flaw?
 
 
 * Cursor needs to have a setPointerPosition(int x, int y) that sets, on its image, a spot where it gets its x and y positions from
@@ -73,6 +79,7 @@ GUI:
 * create TGUIOutOfBoundsException that prints the error along with the id and possible range (and the value that was wrong), example in TGUIComponent
 	* replace all exceptions amongst all guis with this one
 * add a static distance method to TPoint
+* TGUIEvent is obsolete, remove
 
 BUGS:
 * sliders dont set the slider at the right position from the constructor
@@ -80,3 +87,4 @@ BUGS:
 * clicking on an Item in a ListBox gets gradually more offset for some reason (same in other collection implemented subclasses)
 * ListBox numDown is 1 off when using scrollDown/Up compared to normal click scrolling (perhaps make click scroll use scrollDown/Up functions)
 * label word wrapping sometimes adds a space to the list lines, also inf-loops when [[ involved
+* TextBox little positioner can move backwards upon backspacing, even if no text was edited

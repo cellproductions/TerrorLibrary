@@ -4,38 +4,43 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
+import tl.Util.TSize;
+
 public class TButton extends TGUIComponent
 {
 	private Image normal;
 	private Image pushed;
 	private String text;
-	private TGUIClickedEvent mousePress;
 	
 	public TButton()
 	{
 		super();
 		type = ComponentType.button;
+		normal = pushed = TGUIManager.emptyImage;
 	}
 	
 	public TButton(TGUIComponent parent)
 	{
 		super(parent);
 		type = ComponentType.button;
+		normal = pushed = TGUIManager.emptyImage;
 		text = "";
 	}
 	
-	public TButton(TGUIComponent parent, float x, float y, int w, int h)
+	public TButton(TGUIComponent parent, float x, float y, int width, int height)
 	{
-		super(parent, x, y, w, h);
+		super(parent, x, y, width, height);
 		type = ComponentType.button;
+		normal = pushed = TGUIManager.emptyImage;
 		text = "";
 		changed = true;
 	}
 
-	public TButton(TGUIComponent parent, float x, float y, int w, int h, String t) throws SlickException
+	public TButton(TGUIComponent parent, float x, float y, int width, int height, String t) throws SlickException
 	{
-		super(parent, x, y, w, h);
+		super(parent, x, y, width, height);
 		type = ComponentType.button;
+		normal = pushed = TGUIManager.emptyImage;
 		text = t;
 		changed = true;
 	}
@@ -86,41 +91,41 @@ public class TButton extends TGUIComponent
 	@SuppressWarnings("deprecation")
 	private void updateB() throws SlickException
 	{
-		if (normal == null)
+		if (normal == TGUIManager.emptyImage)
 		{
-			normal = new Image(width, height);
+			normal = new Image(size.width, size.height);
 			graphic = normal;
 		}
 		canvas = normal.getGraphics();
 		canvas.clear();
 		canvas.setFont(TGUIManager.guiFont);
 		canvas.setColor(TGUIManager.BUTTON_MAIN);
-		canvas.fillRect(0, 0, width, height);
+		canvas.fillRect(0, 0, size.width, size.height);
 		canvas.setColor(TGUIManager.WHITE);
-		canvas.drawLine(0, 0, width, 0);
-		canvas.drawLine(0, 0, 0, height);
+		canvas.drawLine(0, 0, size.width, 0);
+		canvas.drawLine(0, 0, 0, size.height);
 		canvas.setColor(TGUIManager.BUTTON_BORDER);
-		canvas.drawLine(width - 1, 1, width - 1, height);
-		canvas.drawLine(1, height - 1, width, height - 1);
+		canvas.drawLine(size.width - 1, 1, size.width - 1, size.height);
+		canvas.drawLine(1, size.height - 1, size.width, size.height - 1);
 		canvas.setColor(TGUIManager.BLACK);
-		canvas.drawString(text, width / 2 - (TGUIManager.guiFont.getWidth(text) / 2), height / 2 - (TGUIManager.guiFont.getHeight(text) / 2));
+		canvas.drawString(text, size.width / 2 - (TGUIManager.guiFont.getWidth(text) / 2), size.height / 2 - (TGUIManager.guiFont.getHeight(text) / 2));
 		canvas.flush();
 
-		if (pushed == null)
-			pushed = new Image(width, height);
+		if (pushed == TGUIManager.emptyImage)
+			pushed = new Image(size.width, size.height);
 		canvas = pushed.getGraphics();
 		canvas.clear();
 		canvas.setFont(TGUIManager.guiFont);
 		canvas.setColor(TGUIManager.BUTTON_MAIN);
-		canvas.fillRect(0, 0, width, height);
+		canvas.fillRect(0, 0, size.width, size.height);
 		canvas.setColor(TGUIManager.BUTTON_BORDER);
-		canvas.drawLine(0, 0, width, 0);
-		canvas.drawLine(0, 0, 0, height);
+		canvas.drawLine(0, 0, size.width, 0);
+		canvas.drawLine(0, 0, 0, size.height);
 		canvas.setColor(TGUIManager.WHITE);
-		canvas.drawLine(width - 1, 1, width - 1, height);
-		canvas.drawLine(1, height - 1, width, height - 1);
+		canvas.drawLine(size.width - 1, 1, size.width - 1, size.height);
+		canvas.drawLine(1, size.height - 1, size.width, size.height - 1);
 		canvas.setColor(TGUIManager.BLACK);
-		canvas.drawString(text, width / 2 - (TGUIManager.guiFont.getWidth(text) / 2) - 1, height / 2 - (TGUIManager.guiFont.getHeight(text) / 2) - 1);
+		canvas.drawString(text, size.width / 2 - (TGUIManager.guiFont.getWidth(text) / 2) - 1, size.height / 2 - (TGUIManager.guiFont.getHeight(text) / 2) - 1);
 		canvas.flush();
 	}
 
@@ -148,9 +153,8 @@ public class TButton extends TGUIComponent
 			e.printStackTrace();
 		}
 		
-		if (graphic != null)
-			if (visible && graphic.getAlpha() > 0.00f)
-				g.drawImage(graphic, gx, gy);
+		if (visible && alpha > 0.00f)
+			g.drawImage(graphic, screenPos.x, screenPos.y);
 	}
 	
 	public void mousePressed(int button, int x, int y)
@@ -183,33 +187,13 @@ public class TButton extends TGUIComponent
 			
 			if (mouseIsOver())
 			{
-				if (mouseClick != null)
+				if (mouseRelease != null)
 				{
-					mouseClick.execute(button, x, y, this);
+					mouseRelease.execute(button, x, y, this);
 					changed = true;
 				}
 			}
 		}
-	}
-	
-	public void onMousePress(TGUIClickedEvent function)
-	{
-		mousePress = function;
-	}
-	
-	public void onMouseRelease(TGUIClickedEvent function)
-	{
-		mouseClick = function;
-	}
-	
-	public void onMouseOver(TGUIMouseOverEvent function)
-	{
-		mouseOver = function;
-	}
-	
-	public void onMouseClick(TGUIClickedEvent function) 
-	{
-		onMouseRelease(function);
 	}
 	
 	public void setText(String text)
@@ -218,10 +202,17 @@ public class TButton extends TGUIComponent
 		changed = true;
 	}
 	
-	public void setSize(int w, int h)
+	public void setSize(int width, int height)
 	{
-		super.setSize(w, h);
-		normal = null;
-		pushed = null;
+		super.setSize(width, height);
+		normal = TGUIManager.emptyImage;
+		pushed = TGUIManager.emptyImage;
+	}
+	
+	public void setSize(TSize size)
+	{
+		super.setSize(size);
+		normal = TGUIManager.emptyImage;
+		pushed = TGUIManager.emptyImage;
 	}
 }

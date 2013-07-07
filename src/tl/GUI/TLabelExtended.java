@@ -16,7 +16,7 @@ import org.newdawn.slick.SlickException;
 public class TLabelExtended extends TLabel
 {
 	public static final ComponentType type = ComponentType.labelExtended;
-	private int size;
+	private int height;
 	
 	public TLabelExtended(TGUIComponent parent, float x, float y, int w, String t) throws SlickException
 	{
@@ -35,7 +35,7 @@ public class TLabelExtended extends TLabel
 			h++;
 		}
 		
-		size = h;
+		height = h;
 		
 		graphic = new Image(w, h * 24);
 	}
@@ -57,10 +57,10 @@ public class TLabelExtended extends TLabel
 		else
 			list.add(toDraw);
 		
-		if (size != list.size())
-			graphic = new Image(width, list.size() * 24);
+		if (height != list.size())
+			graphic = new Image(height, list.size() * 24);
 		
-		size = list.size();
+		height = list.size();
 		
 		canvas = graphic.getGraphics();
 		canvas.clear();
@@ -86,7 +86,7 @@ public class TLabelExtended extends TLabel
 		{
 			e.printStackTrace();
 		}
-		if (visible && graphic.getAlpha() > 0.00F)
-			g.drawImage(graphic, gx, gy);
+		if (visible && alpha > 0.00F)
+			g.drawImage(graphic, screenPos.x, screenPos.y);
 	}
 }

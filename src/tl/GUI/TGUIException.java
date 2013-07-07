@@ -11,6 +11,6 @@ public class TGUIException extends RuntimeException
 	
 	public TGUIException(String message)
 	{
-		super("id: " + message);
+		super(message);
 	}
 }

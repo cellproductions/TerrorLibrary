@@ -8,6 +8,8 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
 import tl.Util.TCursor;
+import tl.Util.TPoint;
+import tl.Util.TSize;
 
 /**
  * TGUIComponent is the base class from which all other TGUIComponents derive from.<br>
@@ -28,7 +30,6 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 	public final Color background = TGUIManager.GUI_MAIN;
 	public final Color border = TGUIManager.GUI_BORDER;
 	protected float alpha = 1f; // only for the constructor
-	protected boolean setalpha;
 	
 	/* PROPERTIES_START */
 	/**
@@ -37,35 +38,13 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 	 */
 	protected int ID;
 	
-	protected float x;
 	/**
-	 * The y position on the parent component (position on the screen if parent is null).
-	 * @see #getY()
-	 * @see #setPosition(float, float)
-	 */
-	protected float y;
-	/**
-	 * The x position on the main window.
+	 * The x and y position of the component on the screen.
 	 * @see #getScreenX()
-	 * @see #setPosition(float, float)
-	 */
-	protected float gx;
-	/**
-	 * The y position on the main window.
 	 * @see #getScreenY()
 	 * @see #setPosition(float, float)
 	 */
-	protected float gy;
-	/**
-	 * Width of the component.
-	 * @see #width()
-	 */
-	protected int width;
-	/**
-	 * Height of the component.
-	 * @see #height()
-	 */
-	protected int height;
+	protected TPoint screenPos;
 	/**
 	 * Whether or not the component is visible to the user (true if visible).
 	 * @see #getVisibility()
@@ -86,11 +65,17 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 	/* PROPERTIES_END */
 
 	/**
-	 * An interface instance that is used to run a function upon detecting a mouse click on a TGUIComponent.
+	 * An interface instance that is used to run a function upon detecting a mouse button being pressed down over a TGUIComponent.
 	 * @see TGUIClickedEvent
-	 * @see #onMouseClick(TGUIClickedEvent)
+	 * @see #onMousePressed(TGUIClickedEvent)
 	 */
-	protected TGUIClickedEvent mouseClick;
+	protected TGUIClickedEvent mousePress;
+	/**
+	 * An interface instance that is used to run a function upon detecting a mouse button release while over a TGUIComponent.
+	 * @see TGUIClickedEvent
+	 * @see #onMouseReleased(TGUIClickedEvent)
+	 */
+	protected TGUIClickedEvent mouseRelease;
 	/**
 	 * An interface instance that is used to run a function upon detecting a cursor positioned over a TGUIComponent.
 	 * @see TGUIMouseOverEvent
@@ -124,12 +109,20 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 	public TGUIComponent()
 	{
 		type = ComponentType.component;
+		graphic = TGUIManager.emptyImage;
 		enabled = true;
+		position = new TPoint();
+		screenPos = new TPoint();
+		size = new TSize();
 	}
 
 	public TGUIComponent(TGUIComponent parent)
 	{
 		type = ComponentType.component;
+		graphic = TGUIManager.emptyImage;
+		position = new TPoint();
+		screenPos = new TPoint();
+		size = new TSize();
 		if (parent == null)
 			ID = TGUIManager.numGUIs++;
 		else
@@ -138,37 +131,33 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 		visible = parent != null ? parent.visible : true;
 	}
 
-	public TGUIComponent(TGUIComponent parent, float i, float j, int w, int h)
+	public TGUIComponent(TGUIComponent parent, float x, float y, int width, int height)
 	{
 		this(parent);
-		x = i;
-		y = j;
-		gx = (parent != null ? parent.x : 0) + x;
-		gy = (parent != null ? parent.y : 0) + y;
-		width = w;
-		height = h;
+		position = new TPoint(x, y);
+		screenPos = new TPoint(parent != null ? parent.getX() : 0, parent != null ? parent.getY() : 0);
+		screenPos = screenPos.add(position);
+		size = new TSize(width, height);
 		visible = true;
 		changed = true;
 	}
 	
-	public TGUIComponent(TGUIComponent parent, float i, float j, boolean visible, int w, int h, float t)
+	public TGUIComponent(TGUIComponent parent, float x, float y, boolean visible, int width, int height, float t)
 	{
 		type = ComponentType.component;
+		graphic = TGUIManager.emptyImage;
 		if (parent == null)
 			ID = TGUIManager.numGUIs++;
 		else
 			setParent(parent);
-		x = i;
-		y = j;
-		gx = (parent != null ? parent.x : 0) + x;
-		gy = (parent != null ? parent.y : 0) + y;
-		width = w;
-		height = h;
+		position = new TPoint(x, y);
+		screenPos = new TPoint(parent != null ? parent.getX() : 0, parent != null ? parent.getY() : 0);
+		screenPos = screenPos.add(position);
+		size = new TSize(width, height);
 		enabled = parent != null ? parent.enabled : true;
 		this.visible = visible;
 		changed = true;
 		alpha = t;
-		setalpha = true;
 	}
 	
 	public int getID()
@@ -183,15 +172,16 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 	
 	private void updateC() throws SlickException
 	{
-		if (graphic == null)
-			graphic = new Image(width, height);
-		if (setalpha)
+		if (graphic == TGUIManager.emptyImage)
+		{
+			graphic = new Image(size.width, size.height);
 			graphic.setAlpha(alpha);
+		}
 		canvas = graphic.getGraphics();
 		canvas.setColor(background);
-		canvas.fillRect(0, 0, width - 1, height - 1);
+		canvas.fillRect(0, 0, size.width - 1, size.height - 1);
 		canvas.setColor(border);
-		canvas.drawRect(0, 0, width - 1, height - 1);
+		canvas.drawRect(0, 0, size.width - 1, size.height - 1);
 		canvas.flush();
 	}
 
@@ -219,9 +209,8 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 			e.printStackTrace();
 		}
 		
-		if (graphic != null)
-			if (visible && graphic.getAlpha() > 0.00f)
-				g.drawImage(graphic, gx, gy);
+		if (visible && alpha > 0.00f)
+			g.drawImage(graphic, screenPos.x, screenPos.y);
 		drawAll(g);
 	}
 	
@@ -252,7 +241,7 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 	{
 		float x = TCursor.getX();
 		float y = TCursor.getY();
-		return x >= gx && x <= gx + width && y >= gy && y <= gy + height && isVisible();
+		return x >= screenPos.x && x <= screenPos.x + size.width && y >= screenPos.y && y <= screenPos.y + size.height && isVisible();
 	}
 
 	public boolean mouseButtonDown(int button) // obsolete?
@@ -262,47 +251,65 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 	
 	public float getX()
 	{
-		return x;
+		return position.x;
 	}
 	
 	public float getY()
 	{
-		return y;
+		return position.y;
 	}
 	
 	public float getScreenX()
 	{
-		return gx;
+		return screenPos.x;
 	}
 	
 	public float getScreenY()
 	{
-		return gy;
+		return screenPos.y;
 	}
 
-	public void setPosition(float i, float j)
+	public void setPosition(float x, float y)
 	{
-		x = i;
-		y = j;
-		gx = (parent != null ? parent.x : 0) + x;
-		gy = (parent != null ? parent.y : 0) + y;
+		position.set(x, y);
+		screenPos.set(parent != null ? parent.getX() : 0, parent != null ? parent.getY() : 0);
+		screenPos = screenPos.add(position);
+		if (children != null)
+			for (TGUIComponent child : children)
+				child.setPosition(child.getX(), child.getY());
+	}
+	
+	public void setPosition(TPoint position)
+	{
+		this.position.set(position);
+		screenPos.set(parent != null ? parent.getX() : 0, parent != null ? parent.getY() : 0);
+		screenPos = screenPos.add(position);
+		if (children != null)
+			for (TGUIComponent child : children)
+				child.setPosition(child.getPosition());
 	}
 	
 	public int width()
 	{
-		return width;
+		return size.width;
 	}
 	
 	public int height()
 	{
-		return height;
+		return size.height;
 	}
 
-	public void setSize(int w, int h)
+	public void setSize(int width, int heigth)
 	{
-		width = w;
-		height = h;
-		graphic = null;
+		size.set(width, heigth);
+		graphic = TGUIManager.emptyImage;
+		changed = true;
+	}
+	
+	public void setSize(TSize size)
+	{
+		this.size.set(size);
+		graphic = TGUIManager.emptyImage;
 		changed = true;
 	}
 
@@ -332,8 +339,9 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 	
 	public void setTransparency(float transparency) throws TGUIException
 	{
-		if (transparency < 0f || transparency > 1f)
-			throw new TGUIException(type.toString() + "[" + ID + "]: transparency " + transparency + " out of bounds");
+		//if (transparency < 0f || transparency > 1f)
+			//throw new TGUIException(type.toString() + "[" + ID + "]: transparency " + transparency + " out of bounds");
+		alpha = transparency;
 		if (graphic != null)
 			graphic.setAlpha(transparency);
 		if (children != null)
@@ -343,7 +351,7 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 	
 	public float getTransparency()
 	{
-		return graphic != null ? graphic.getAlpha() : 1f;
+		return alpha;
 	}
 	
 	public void setEnabled(boolean enabled)
@@ -362,8 +370,8 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 	protected void setProperties(TGUIComponent parent)
 	{
 		boolean notnull = parent != null;
-		gx = (notnull ? parent.x : 0) + x;
-		gy = (notnull ? parent.y : 0) + y;
+		screenPos.set(parent != null ? parent.getX() : 0, parent != null ? parent.getY() : 0);
+		screenPos = screenPos.add(position);
 		visible = (notnull ? parent.visible : true);
 		enabled = (notnull ? parent.enabled : true);
 		if (graphic != null)
@@ -383,12 +391,15 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 	{
 		if (child == null)
 			throw new TGUIException(type.toString() + "[" + ID + "]: child component is NULL!");
-		if (child.parent != this)
-			throw new TGUIException(type.toString() + "[" + ID + "]: childs[" + child.ID + "] parent has not been set as this component!");
+		//if (child.parent != this)
+			//throw new TGUIException(type.toString() + "[" + ID + "]: child's[" + child.ID + "] parent[" + (parent == null ? "null" : parent.ID) + "] has not been set as this component!");
 		if (children == null)
 			children = new ArrayList<TGUIComponent>();
-		if (!children.contains(child))
+		else if (!children.contains(child))
 		{
+			if (child.parent != null && child.parent != this)
+				child.parent.children.remove(child);
+			child.parent = this;
 			child.setProperties(this);
 			children.add(child);
 			int id = 0;
@@ -404,7 +415,7 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 		if (child != null)
 			child.parent = null;
 		children.remove(child);
-		child.setPosition(child.x, child.y);
+		child.setPosition(child.getX(), child.getY());
 	}
 	
 	public synchronized void removeComponent(int index) throws TGUIException
@@ -464,9 +475,14 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 		mouseOver = function;
 	}
 	
-	public void onMouseClick(TGUIClickedEvent function)
+	public void onMousePress(TGUIClickedEvent function)
 	{
-		mouseClick = function;
+		mousePress = function;
+	}
+	
+	public void onMouseRelease(TGUIClickedEvent function)
+	{
+		mouseRelease = function;
 	}
 
 	public void mousePressed(int button, int x, int y)
@@ -475,8 +491,8 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 		{
 			if (mouseIsOver())
 			{
-				if (mouseClick != null)
-					mouseClick.execute(button, x, y, this);
+				if (mousePress != null)
+					mousePress.execute(button, x, y, this);
 			}
 			if (children != null)
 				for (TGUIComponent child : children)

@@ -1,12 +1,15 @@
 package tl.GUI;
 
 import org.newdawn.slick.Color;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
+import org.newdawn.slick.SlickException;
 import org.newdawn.slick.TrueTypeFont;
 
 @SuppressWarnings("deprecation")
 public class TGUIManager
 {
+	public static Image emptyImage;
 	public static TrueTypeFont guiFont;
 	public static int screenHeight;
 	public static int screenWidth;
@@ -16,10 +19,25 @@ public class TGUIManager
 
 	public static void init(Input input, int width, int height, TrueTypeFont font)
 	{
+		emptyImage = createEmptyImage();
 		guiInput = input;
 		screenWidth = width;
 		screenHeight = height;
 		guiFont = font;
+	}
+	
+	private static Image createEmptyImage()
+	{
+		Image i = null;
+		try
+		{
+			i = new Image(0, 0);
+		}
+		catch (SlickException e)
+		{
+			e.printStackTrace();
+		}
+		return i;
 	}
 	
 	public static Color COMPONENT_GREYED = new Color(128, 128, 128, .8f);
