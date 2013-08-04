@@ -1,6 +1,11 @@
 TODO:
 
+Button:
+* normal and pushed should scale when resized
+
+
 ButtonToggle:
+* should be abled to toggle between images as well
 
 
 Container:
@@ -8,9 +13,11 @@ Container:
 * fix widths to account for scroll bar (or horizontal scrolling?)
 * Make a ContainerGen class that inherits Container, Container stores images, ContainerGen stores images and generic objects
 * fill out scroll functions + sort function
+* change iwidth/iheight to isize(TSize)
 
 
 Label:
+* text isnt centred vertically
 
 
 LabelExtended:
@@ -27,8 +34,6 @@ ListBox:
 
 
 ListBoxGen:
-* should be its own superclass (shouldnt inherit from ListBox)
-	* as a result, ListBoxDropGen should inherit from this component
 
 
 ListBoxDrop:
@@ -41,6 +46,7 @@ TextBox:
 * text box's should allow typing sentences outside of the box area
 * if there is enough vertical space, allow multiple lines of text to be typed
 * upon tab key being pressed, set next textbox in set (from parent) to the active one (or in the next set if there are no more textbox's in the current set)
+* setting a textbox as the active one should place the positioner at the end of the text
 
 
 GUIComponents:
@@ -61,6 +67,7 @@ GUIComponents:
 * only allow clicking on a single component, e.g. multiple overlapping components will receive the same mouse click, etc, must be stopped
 * adding a component should set its parent to the component doing the adding
 * instead of checking if graphic == null, create a nullImage image and initialise all graphics with that (0x0 image with nothing in it)
+* remove all excess changed = true; statements (most arent needed anymore)
 
 
 GUI:
@@ -69,6 +76,8 @@ GUI:
 
 GUILayout:
 * putting one layout inside another and organising the other wont really effect the former (besides move it, but the spacing isnt considered), design flaw?
+* setting a new parent should reorganise the children?
+* should not be reliant on the parent for position and size, setting a parent should set the size and position according to the parent
 
 
 * Cursor needs to have a setPointerPosition(int x, int y) that sets, on its image, a spot where it gets its x and y positions from
@@ -78,13 +87,28 @@ GUILayout:
 * create Interfaces that describe different functions for GUIComponents
 * create TGUIOutOfBoundsException that prints the error along with the id and possible range (and the value that was wrong), example in TGUIComponent
 	* replace all exceptions amongst all guis with this one
-* add a static distance method to TPoint
 * TGUIEvent is obsolete, remove
+* create a TGUIScreenLayout that positions gui's around the screen(far left, far right, top, bottom, centre, etc etc)
+* colours should be more abstract, and they should be able to be edited without needing access to the actual colour
+* components with separate parts should abstract those parts out (include their own colours)
+* components should be able to handle animating images(animations)
+* components should implement Iterable<>
+* the TIGUICollection interface should implement Iterable<>
+* create abstract classes for generic components (including TButtonToggle)
+* allow returning topright and bottomleft corners as TPoints
+* add get...X get...Y to TBound, allow access to each individual point
+* add a TGUIPalette class that holds all colours used by the gui system
+	* also add a TPalettes enum that holds a bunch of pre-made themes and can swap out palettes
+* complete TSize comparison methods
+* add TGUIVisibilityEvent, gets called every time a component's visibility is toggled
 
 BUGS:
-* sliders dont set the slider at the right position from the constructor
-* sliders dont 'slide' anymore, they must slide :P
 * clicking on an Item in a ListBox gets gradually more offset for some reason (same in other collection implemented subclasses)
 * ListBox numDown is 1 off when using scrollDown/Up compared to normal click scrolling (perhaps make click scroll use scrollDown/Up functions)
+* ListBox selection background (black bar) doesnt draw in the right spot
+* ListBox doesnt draw items that need to be scrolled to see
 * label word wrapping sometimes adds a space to the list lines, also inf-loops when [[ involved
+* label word wrapping draws the new lines onto the same line as the first
+* label detecting when to word wrap is wrong (pos.x + textwidth is somehow larger than label width)
 * TextBox little positioner can move backwards upon backspacing, even if no text was edited
+* adding TGUIComponent to another will not update the new one properly (position is wrong)

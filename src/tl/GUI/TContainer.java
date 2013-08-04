@@ -9,6 +9,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Polygon;
 
 import tl.Util.TCursor;
+import tl.Util.TSize;
 
 public class TContainer<T> extends TGUIComponent implements TIGUICollection
 {
@@ -21,6 +22,8 @@ public class TContainer<T> extends TGUIComponent implements TIGUICollection
 	private int gap;
 	private boolean scaled;
 	private int selected;
+	public final Color border = new Color(Color.black);
+	public final Color selected_colour = new Color(Color.yellow);
 	
 	TGUISelectionEvent selectionChange;
 	TGUILoopEvent looped; // NOT NEEDED?
@@ -64,8 +67,38 @@ public class TContainer<T> extends TGUIComponent implements TIGUICollection
 		changed = true;
 	}
 	
-	private void updateC() throws SlickException
+	protected void change()
 	{
+		int wgap = iWidth + gap;
+		int hgap = iHeight + gap;
+		float numNeededRows;
+		int numInRow = (this.width() - (toobig ? 15 : 0) - gap) / wgap; // needs a scrollbar width
+		int numRows = (this.height() - gap) / hgap;
+		numNeededRows = Math.round((float)numItems / Math.max(numInRow, 1));
+		toobig = (hgap) * (numItems % numNeededRows) + gap > size.height;
+		
+		float row = gap;
+		float col = gap;
+		for (int i = numDown * numInRow; i < (numItems < numInRow * numRows ? numItems : numInRow * numRows); ++i)
+		{
+			items.get(i).pos.set(col, row);
+			col += wgap;
+			if (col / wgap > numInRow)
+			{
+				col = gap;
+				row += hgap;
+				if (row / hgap > numRows)
+					row = gap;
+			}
+		}
+		
+		border.a = alpha;
+		selected_colour.a = alpha;
+		changed = false;
+	}
+	
+	protected void draw(Graphics g) throws SlickException
+	{/*
 		if (graphic == TGUIManager.emptyImage)
 			graphic = new Image(size.width, size.height);
 		canvas = graphic.getGraphics();
@@ -73,7 +106,7 @@ public class TContainer<T> extends TGUIComponent implements TIGUICollection
 		canvas.setColor(new Color(0, 0, 0));
 		canvas.drawRect(0, 0, size.width - 1, size.height - 1);
 		
-		toobig = (iHeight + gap) * numItems + gap > size.height ? true : false; // + gap for starting gap
+		 ? true : false; // + gap for starting gap*/
 		/*
 		double w = width;
 		double iw = iWidth;
@@ -96,7 +129,7 @@ public class TContainer<T> extends TGUIComponent implements TIGUICollection
 		}
 		*/
 		// this wont draw items after scrolling down (cant use for-each loop)
-		int fitWidth = (int)Math.round(size.width / (iWidth + gap)); // how many items can fit horizontally
+		/*int fitWidth = (int)Math.round(size.width / (iWidth + gap)); // how many items can fit horizontally
 		int vert = 0;
 		int numhor = 0;
 		Image todraw;
@@ -139,7 +172,46 @@ public class TContainer<T> extends TGUIComponent implements TIGUICollection
 			canvas.fill(up);
 			canvas.fill(down);
 		}
-		canvas.flush();
+		canvas.flush();*/
+		
+		g.setColor(border);
+		g.drawRect(screenPos.x, screenPos.y, size.width, size.height);
+		int numInRow = (this.width() - (toobig ? 15 : 0) - gap) / (iWidth + gap);
+		int numRows = (this.height() - gap) / (iHeight + gap);
+		for (int i = numDown * numInRow; i < (numItems < numInRow * numRows ? numItems : numInRow * numRows); ++i)
+		{
+			Item item = items.get(i);
+			float x = screenPos.x + item.pos.x;
+			float y = screenPos.y + item.pos.y;
+			g.drawImage(item.iGraphic, x, y);
+			if (i == selected)
+			{
+				g.setColor(selected_colour);
+				g.drawRect(x, y, iWidth - 1, iHeight - 1);
+				g.setColor(TGUIManager.BLACK);
+			}
+		}
+		if (toobig)
+		{
+			g.setColor(border);
+			float x = screenPos.x + size.width;
+			float y = screenPos.y + size.height;
+			g.drawLine(x - 13, y / 2, x, y / 2);
+			g.drawLine(x - 14, screenPos.y, x - 14, y);
+			Polygon up = new Polygon();
+			up.addPoint(x - 12, screenPos.y + 10);
+			up.addPoint(x - 2, screenPos.y + 10);
+			up.addPoint(x - 7, screenPos.y + 2);
+			g.draw(up);
+			Polygon down = new Polygon();
+			down.addPoint(x - 12, y - 10);
+			down.addPoint(x - 2, y - 10);
+			down.addPoint(x - 7, y - 2);
+			g.draw(down);
+			g.fill(up);
+			g.fill(down);
+		}
+		g.setColor(Color.black);
 	}
 	
 	public void update(Graphics g)
@@ -193,21 +265,18 @@ public class TContainer<T> extends TGUIComponent implements TIGUICollection
 			changed = true;
 		}
 		
+		if (changed)
+			change();
+		
 		try
 		{
-			if (changed)
-			{
-				updateC();
-				changed = false;
-			}
+			if (visible && alpha > 0.00f)
+				draw(g);
 		}
-		catch(SlickException e)
+		catch (SlickException e)
 		{
 			e.printStackTrace();
 		}
-		
-		if (visible && alpha > 0.00F)
-			g.drawImage(graphic, screenPos.x, screenPos.y);
 	}
 	
 	public void onSelectionChange(TGUISelectionEvent function)
@@ -292,11 +361,18 @@ public class TContainer<T> extends TGUIComponent implements TIGUICollection
 	{
 		public Image iGraphic;
 		public T object;
+		public tl.Util.TPoint pos;
 		
 		public Item(Image i, T object)
 		{
+			pos = new tl.Util.TPoint();
 			iGraphic = scaled ? i.getScaledCopy(iWidth, iHeight) : i;
 			this.object = object;
+		}
+		
+		public void setSize(int width, int height)
+		{
+			iGraphic = iGraphic.getScaledCopy(width, height);
 		}
 	}
 	
@@ -367,7 +443,7 @@ public class TContainer<T> extends TGUIComponent implements TIGUICollection
 	
 	public int getIndexFromCoordinates(float x, float y) throws TGUIException
 	{
-		int fitWidth = (int)Math.round(size.width / (iWidth + gap));
+		int fitWidth = (int)(size.width / (iWidth + gap));
 		int column = (int)(x / (gap + iWidth));
 		int row = (int)(y / (gap + iHeight));
 		if ((row * fitWidth) + column < 0 || (row * fitWidth) + column >= numItems)
@@ -380,6 +456,62 @@ public class TContainer<T> extends TGUIComponent implements TIGUICollection
 		items.clear();
 		numItems = 0;
 		changed = true;
+	}
+	
+	public void setImageSize(int width, int height)
+	{
+		iWidth = width;
+		iHeight = height;
+		if (items != null)
+			for (Item item : items)
+				item.setSize(width, height);
+		changed = true;
+	}
+	
+	public void setImageSize(TSize size)
+	{
+		iWidth = size.width;
+		iHeight = size.height;
+		if (items != null)
+			for (Item item : items)
+				item.setSize(size.width, size.height);
+		changed = true;
+	}
+	
+	public void setGapSize(int size)
+	{
+		gap = size;
+		changed = true;
+	}
+	
+	public int itemWidth()
+	{
+		return iWidth;
+	}
+	
+	public int itemHeight()
+	{
+		return iHeight;
+	}
+	
+	public int getGapSize()
+	{
+		return gap;
+	}
+	
+	public void setTransparency(float transparency) throws TGUIException
+	{
+		//if (transparency < 0f || transparency > 1f)
+			//throw new TGUIException(type.toString() + "[" + ID + "]: transparency " + transparency + " out of bounds");
+		alpha = transparency;
+		if (graphic != null)
+			graphic.setAlpha(transparency);
+		for (Item item : items)
+			if (item.iGraphic != null)
+				item.iGraphic.setAlpha(alpha);
+		if (children != null)
+			for (TGUIComponent child : children)
+				child.setTransparency(transparency);
 	}
 
 	@Override
@@ -406,5 +538,11 @@ public class TContainer<T> extends TGUIComponent implements TIGUICollection
 	public int itemCount()
 	{
 		return items.size();
+	}
+
+	public void deselect()
+	{
+		selected = -1;
+		changed = true;
 	}
 }

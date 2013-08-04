@@ -1,6 +1,6 @@
 package tl.Util;
 
-public class TPoint
+public class TPoint implements Comparable<TPoint>
 {
 	public float x;
 	public float y;
@@ -104,6 +104,11 @@ public class TPoint
 		return 0;
 	}
 	
+	public int compareTo(TPoint other)
+	{
+		return compare(other);
+	}
+	
 	public String toFormattedString()
 	{
 		return x + "," + y;
@@ -155,5 +160,63 @@ public class TPoint
 	public static TPoint get2DIndex(int index, int width)
 	{
 		return new TPoint(index % width, index / width);
+	}
+	
+	/**
+	 * Used to find the distance between two points, using the linear distance algorithm.
+	 * @param source - The first point
+	 * @param destination - The second point
+	 * @return - The distance between a and b, square rooted
+	 */
+	public static double distance(TPoint source, TPoint destination)
+	{
+		//return Math.sqrt(Math.pow((destination.x - source.x), 2) + Math.pow((destination.y - source.y), 2));
+		return length(destination.subtract(source));
+	}
+	
+	/**
+	 * Used by {@link #distance(TPoint, TPoint)} and {@link #normalize(TPoint)} to find the length for a single point. 
+	 * @param point - The point to find the length of
+	 * @return - A double representing the length
+	 */
+	public static double length(TPoint point)
+	{
+		return Math.sqrt(point.x * point.x + point.y * point.y);
+	}
+	
+	/**
+	 * Creates and returns a direction from a source point to a destination point.
+	 * @param source - The point to start from
+	 * @param destination - The point to arrive at
+	 * @return - The direction as a TPoint
+	 */
+	public static TPoint normalize(TPoint source, TPoint destination)
+	{
+		TPoint point = destination.subtract(source);
+		return new TPoint(point.x / (float)length(point), point.y / (float)length(point));
+	}
+	
+	/**
+	 * Returns the angle of a straight line between two points, converted to degrees.
+	 * @param source - The source point
+	 * @param destination - The destination point
+	 * @return - The angle as a double
+	 * @see #angleRadians(TPoint, TPoint)
+	 */
+	public static double angle(TPoint source, TPoint destination)
+	{
+		return Math.toDegrees(Math.atan2(destination.y - source.y, destination.x - source.x));
+	}
+	
+	/**
+	 * Returns the angle of a straight line between two points, converted to radians.
+	 * @param source - The source point
+	 * @param destination - The destination point
+	 * @return - The angle as a double
+	 * @see #angle(TPoint, TPoint)
+	 */
+	public static double angleRadians(TPoint source, TPoint destination)
+	{
+		return Math.atan2(destination.y - source.y, destination.x - source.x);
 	}
 }

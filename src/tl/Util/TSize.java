@@ -1,6 +1,6 @@
 package tl.Util;
 
-public class TSize
+public class TSize implements Comparable<TSize>
 {
 	public int width;
 	public int height;
@@ -75,6 +75,11 @@ public class TSize
 	}
 	
 	// COMPARISON METHODS GO HERE
+	public int compareTo(TSize o)
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
 	
 	public String toFormattedString()
 	{

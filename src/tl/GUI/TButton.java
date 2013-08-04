@@ -1,5 +1,6 @@
 package tl.GUI;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
@@ -11,6 +12,11 @@ public class TButton extends TGUIComponent
 	private Image normal;
 	private Image pushed;
 	private String text;
+	private boolean isPushed;
+	public final Color background = new Color(TGUIManager.BUTTON_MAIN);
+	public final Color border_white = new Color(TGUIManager.WHITE);
+	public final Color border_grey = new Color(TGUIManager.BUTTON_BORDER);
+	public final Color font_colour = new Color(TGUIManager.BLACK);
 	
 	public TButton()
 	{
@@ -88,9 +94,18 @@ public class TButton extends TGUIComponent
 		return type;
 	}
 	
-	@SuppressWarnings("deprecation")
-	private void updateB() throws SlickException
+	protected void change()
 	{
+		background.a = alpha;
+		border_white.a = alpha;
+		border_grey.a = alpha;
+		font_colour.a = alpha;
+		changed = false;
+	}
+	
+	@SuppressWarnings("deprecation")
+	protected void draw(Graphics g) throws SlickException
+	{/*
 		if (normal == TGUIManager.emptyImage)
 		{
 			normal = new Image(size.width, size.height);
@@ -126,54 +141,90 @@ public class TButton extends TGUIComponent
 		canvas.drawLine(1, size.height - 1, size.width, size.height - 1);
 		canvas.setColor(TGUIManager.BLACK);
 		canvas.drawString(text, size.width / 2 - (TGUIManager.guiFont.getWidth(text) / 2) - 1, size.height / 2 - (TGUIManager.guiFont.getHeight(text) / 2) - 1);
-		canvas.flush();
+		canvas.flush();*/
+		if (!isPushed)
+		{
+			int widthpos = (int)(screenPos.x + size.width);
+			int heightpos = (int)(screenPos.y + size.height);
+			g.setFont(TGUIManager.guiFont);
+			g.setColor(background);
+			g.fillRect(screenPos.x, screenPos.y, size.width, size.height);
+			g.setColor(border_white);
+			g.drawLine(screenPos.x, screenPos.y, widthpos, screenPos.y);
+			g.drawLine(screenPos.x, screenPos.y, screenPos.x, heightpos);
+			g.setColor(border_grey);
+			g.drawLine(widthpos, screenPos.y + 1, widthpos, heightpos);
+			g.drawLine(screenPos.x + 1, heightpos, widthpos, heightpos);
+			g.setColor(font_colour);
+			g.drawString(text, screenPos.x + (size.width / 2 - (TGUIManager.guiFont.getWidth(text) / 2)), screenPos.y + (size.height / 2 - (TGUIManager.guiFont.getHeight(text) / 2)));
+			g.setColor(TGUIManager.BLACK);
+		}
+		else if (isPushed)
+		{
+			int widthpos = (int)(screenPos.x + size.width);
+			int heightpos = (int)(screenPos.y + size.height);
+			g.setFont(TGUIManager.guiFont);
+			g.setColor(background);
+			g.fillRect(screenPos.x, screenPos.y, size.width, size.height);
+			g.setColor(border_grey);
+			g.drawLine(screenPos.x, screenPos.y, widthpos, screenPos.y);
+			g.drawLine(screenPos.x, screenPos.y, screenPos.x, heightpos);
+			g.setColor(border_white);
+			g.drawLine(widthpos, screenPos.y + 1, widthpos, heightpos);
+			g.drawLine(screenPos.x + 1, heightpos, widthpos, heightpos);
+			g.setColor(font_colour);
+			g.drawString(text, screenPos.x + (size.width / 2 - (TGUIManager.guiFont.getWidth(text) / 2) - 1), screenPos.y + (size.height / 2 - (TGUIManager.guiFont.getHeight(text) / 2) - 1));
+			g.setColor(TGUIManager.BLACK);
+		}
 	}
+	
+	protected boolean isOver = false; // JUST FOR 7dRTS
 
 	public void update(Graphics g)
 	{
 		if (mouseIsOver())
 		{
-			if (mouseOver != null)
+			if (mouseOver != null && !isOver)
 			{
 				mouseOver.execute(this);
 				changed = true;
+				isOver = true;
 			}
 		}
+		else
+			isOver = false;
+		
+		if (changed)
+			change();
 		
 		try
 		{
-			if (changed)
-			{
-				updateB();
-				changed = false;
-			}
+			if (visible && alpha > 0.00f)
+				draw(g);
 		}
 		catch (SlickException e)
 		{
 			e.printStackTrace();
 		}
-		
-		if (visible && alpha > 0.00f)
-			g.drawImage(graphic, screenPos.x, screenPos.y);
 	}
 	
 	public void mousePressed(int button, int x, int y)
 	{
 		if (enabled)
 		{
+			if (!mouseIsOver())
+				return;
+			
 			if (button == 0)
 			{
-				if (mouseIsOver())
-					graphic = pushed;
+				graphic = pushed;
+				isPushed = true;
 			}
 			
-			if (mouseIsOver())
+			if (mousePress != null)
 			{
-				if (mousePress != null)
-				{
-					mousePress.execute(button, x, y, this);
-					changed = true;
-				}
+				mousePress.execute(button, x, y, this);
+				changed = true;
 			}
 		}
 	}
@@ -181,18 +232,21 @@ public class TButton extends TGUIComponent
 	public void mouseReleased(int button, int x, int y)
 	{
 		if (enabled)
-		{
+		{	
 			if (button == 0)
 				graphic = normal;
 			
 			if (mouseIsOver())
 			{
-				if (mouseRelease != null)
+				if (mouseRelease != null && isPushed)
 				{
 					mouseRelease.execute(button, x, y, this);
 					changed = true;
 				}
 			}
+			
+			if (button == 0)
+				isPushed = false;
 		}
 	}
 	

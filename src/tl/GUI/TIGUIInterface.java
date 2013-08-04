@@ -10,7 +10,7 @@ import org.newdawn.slick.Graphics;
  * @since 1.5
  * @see TGUIComponent
  */
-public interface TGUIInterface // observer pattern
+public interface TIGUIInterface
 {
 	/**
 	 * Used to update upon a keyboard button being released.<br>
@@ -62,7 +62,7 @@ public interface TGUIInterface // observer pattern
 	
 	
 	/**
-	 * The main update function used to update and draw the TGUI component.<br>
+	 * The main update function used to update and draw the TGUIComponent.<br>
 	 * It takes a Graphics object to draw on.
 	 * @param graphics - The graphics context on which to draw the TGUIComponent
 	 */

@@ -9,7 +9,6 @@ import java.io.IOException;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 
@@ -21,6 +20,8 @@ public class TTextBox extends TGUIComponent
 	private String text;
 	private Position tPosition;
 	private float typos; // text y tPosition
+	public final Color border = new Color(TGUIManager.BLACK);
+	public final Color font_colour = new Color(TGUIManager.BLACK);
 	
 	private TGUITextEvent textChange;
 	private TGUITextEvent enterKey;
@@ -63,6 +64,7 @@ public class TTextBox extends TGUIComponent
 			TTextBox.activeTB = this;
 		text = oldText = def;
 		tPosition = new Position();
+		tPosition.set(def.length());
 		typos = size.height / 2 - (TGUIManager.guiFont.getHeight(text) / 2) - 2;
 		changed = true;
 	}
@@ -73,8 +75,17 @@ public class TTextBox extends TGUIComponent
 	}
 	
 	@SuppressWarnings("deprecation")
-	private void updateText() throws SlickException
+	protected void change()
 	{
+		typos = size.height / 2 - (TGUIManager.guiFont.getHeight(text) / 2) - 2;
+		border.a = alpha;
+		font_colour.a = alpha;
+		changed = false;
+	}
+	
+	@SuppressWarnings("deprecation")
+	protected void draw(Graphics g) throws SlickException
+	{/*
 		if (graphic == TGUIManager.emptyImage)
 			graphic = new Image(size.width, size.height);
 		canvas = graphic.getGraphics();
@@ -86,7 +97,15 @@ public class TTextBox extends TGUIComponent
 		if (isActive())
 			canvas.drawString("_", TGUIManager.guiFont.getWidth(tPosition.get() < text.length() ? text.substring(0, tPosition.get()) : text), typos + 2);
 		canvas.drawString(text, 3, typos);
-		canvas.flush();
+		canvas.flush();*/
+		g.setFont(TGUIManager.guiFont);
+		g.setColor(border);
+		g.drawRect(screenPos.x, screenPos.y, size.width, size.height);
+		g.setColor(font_colour);
+		if (isActive())
+			g.drawString("_", screenPos.x + TGUIManager.guiFont.getWidth(tPosition.get() < text.length() ? text.substring(0, tPosition.get()) : text), screenPos.y + typos + 2);
+		g.drawString(text, screenPos.x + 3, screenPos.y + typos);
+		g.setColor(TGUIManager.BLACK);
 	}
 	
 	private boolean arrowdown;
@@ -163,21 +182,18 @@ public class TTextBox extends TGUIComponent
 			}
 		}
 		
+		if (changed)
+			change();
+		
 		try
 		{
-			if (changed)
-			{
-				updateText();
-				changed = false;
-			}
+			if (visible && alpha > 0.00f)
+				draw(g);
 		}
 		catch (SlickException e)
 		{
 			e.printStackTrace();
 		}
-
-		if (visible && alpha > 0.00F)
-			g.drawImage(graphic, screenPos.x, screenPos.y);
 	}
 	
 	public void mousePressed(int button, int x, int y)
@@ -187,12 +203,7 @@ public class TTextBox extends TGUIComponent
 			if (mouseIsOver())
 			{
 				if (button == 0)
-				{
-					if (TTextBox.activeTB != null)
-						TTextBox.activeTB.changed = true;
-					TTextBox.activeTB = this;
-					changed = true;
-				}
+					setAsActive();
 			}
 			
 			if (mousePress != null)
@@ -349,10 +360,42 @@ public class TTextBox extends TGUIComponent
 		return text;
 	}
 	
+	public void setAsActive()
+	{
+		if (TTextBox.activeTB != null)
+			TTextBox.activeTB.changed = true;
+		TTextBox.activeTB = this;
+		changed = true;
+	}
+	
 	public void clear()
 	{
 		text = "";
 		tPosition.set(0);
+	}
+	
+	public void moveCaretRight()
+	{
+		tPosition.right();
+		changed = true;
+	}
+	
+	public void moveCaretLeft()
+	{
+		tPosition.left();
+		changed = true;
+	}
+	
+	public void setCaretRight()
+	{
+		tPosition.set(text.length());
+		changed = true;
+	}
+	
+	public void setCaretLeft()
+	{
+		tPosition.set(0);
+		changed = true;
 	}
 	
 	private class Position

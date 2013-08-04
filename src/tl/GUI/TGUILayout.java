@@ -56,6 +56,8 @@ public abstract class TGUILayout extends TGUIObject
 		components = new LinkedList<>();
 		space = 3;
 		organiseOnAdd = onAdd;
+		//position = parent != null ? (parent instanceof TGUIComponent ? new TPoint() : parent.position) : new TPoint();
+		//size = parent != null ? parent.size : new TSize(TGUIManager.screenWidth, TGUIManager.screenHeight);
 		position = new TPoint();
 		size = new TSize();
 	}
@@ -251,6 +253,12 @@ public abstract class TGUILayout extends TGUIObject
 	 */
 	protected int childSizes(TSize parentSize, TEDirection direction) // total size each object must be to fit into the parent if stretching is on
 	{
-		return (int)Math.ceil((float)((direction == TEDirection.TopToBottom ? parentSize.height : parentSize.width) - ((components.size() + 1) * space)) / (float)components.size());
+		int csize = components.size();
+		float size = (((direction == TEDirection.TOP_TO_BOTTOM ? parentSize.height : parentSize.width) - ((csize + 1) * space)) / (float)components.size());
+		if ((float)Math.ceil(size) * csize + (space * (csize + 1)) > parent.getSize().height)
+			size = (float)Math.floor(size);
+		else
+			size = (float)Math.ceil(size);
+		return (int)size;
 	}
 }

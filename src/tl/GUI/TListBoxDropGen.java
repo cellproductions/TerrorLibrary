@@ -9,10 +9,8 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Polygon;
 
-public class TListBoxDropGen<T> extends TListBoxDrop
+public class TListBoxDropGen<T> extends TAbstractListBoxDrop<TListBoxItem<T>>
 {
-	public List<Item> items;
-	
 	public TListBoxDropGen()
 	{
 		super();
@@ -23,141 +21,97 @@ public class TListBoxDropGen<T> extends TListBoxDrop
 	{
 		super(parent, x, y, width, height);
 		type = ComponentType.listBoxDropGen;
-		items = new ArrayList<Item>();
+		items = new ArrayList<TListBoxItem<T>>();
 	}
 	
 	public TListBoxDropGen(TGUIComponent parent, float x, float y, int width, int height, int index, Color background) throws SlickException
 	{
 		super(parent, x, y, width, height);
 		type = ComponentType.listBoxDropGen;
-		items = new ArrayList<Item>();
+		items = new ArrayList<TListBoxItem<T>>();
 	}
 	
 	public TListBoxDropGen(TGUIComponent parent, float x, float y, int width, int height, int index, Color background, int priority) throws SlickException
 	{
 		super(parent, x, y, width, height);
 		type = ComponentType.listBoxDropGen;
-		items = new ArrayList<Item>();
+		items = new ArrayList<TListBoxItem<T>>();
 	}
 	
-	private void updateLBD() throws SlickException	// IS THIS NEEDED? INHERITED FROM LISTBOXDROP ALREADY
+	protected void draw(Graphics g) throws SlickException
 	{
-		canvas = graphic.getGraphics();
-		canvas.clear();
-		canvas.setColor(TGUIManager.BLACK);
-		canvas.drawRect(0, 0, size.width - 1, (dropped ? size.height : defH) - 1); // draw the box outline/background
-		canvas.setFont(TGUIManager.guiFont);
-		if (parent.getType() == ComponentType.component)
-			background = parent.background;
-		
-		canvas.setColor(background);
-		canvas.fillRect(1, 1, size.width - 2, (dropped ? size.height : defH) - 2);
+		g.setColor(background);
+		g.fillRect(screenPos.x, screenPos.y, size.width, dropped ? size.height : defH);
+		g.setColor(border);
+		g.drawRect(screenPos.x, screenPos.y, size.width, dropped ? size.height : defH);
+		g.setFont(TGUIManager.guiFont);
 		
 		int fontHeight = gapHeight - 5;
-
 		if (dropped)
 		{
-			for (int i = 0; i < numItems; i++)
+			int numRows = (this.height() - 5) / (gapHeight - 5);
+			for (int i = numDown; i < (numItems < numRows ? numItems : numRows); ++i)
 			{
-				if (fontHeight * i + fontHeight < size.height)
+				g.setColor(font_colour);
+				if (i == selected)
 				{
-					toobig = false;
-					if (numDown + i < numItems)
-					{
-						canvas.setColor(TGUIManager.BLACK);
-						if (numDown + i == selected) // draw the black box underneath the text if selected
-						{
-							canvas.fillRect(1, i * (size.height / (size.height / fontHeight)) + 3, size.width - 15, fontHeight + 2);
-							canvas.setColor(newSelected != null ? newSelected : defSelected);
-						}
-						canvas.drawString(items.get(i + numDown).text, 3, i * (size.height / (size.height / fontHeight))); // draw the item
-					}
+					g.setColor(selected_background);
+					g.fillRect(screenPos.x + 1, screenPos.y + i * gapHeight, size.width - 15, fontHeight + 2);
+					g.setColor(selected_colour);
 				}
-				else
-				{
-					toobig = true; // size.height of the number of items in the list is greater than the size.height of the list itself
-					i = numItems; // break out of loop
-				}
+				g.drawString(items.get(i).item, screenPos.x + 3, screenPos.y + i * (gapHeight - 5));
 			}
-	
-			if (toobig) // draw the scroll arrows
+			
+			if (tooBig())
 			{
-				canvas.setColor(TGUIManager.BLACK);
-				canvas.drawLine(size.width - 13, size.height / 2, size.width - 1, size.height / 2);
-				canvas.drawLine(size.width - 14, 1, size.width - 14, size.height);
+				g.setColor(border);
+				g.drawLine(screenPos.x + size.width - 13, screenPos.y + size.height / 2, screenPos.x + size.width, screenPos.y + size.height / 2);
+				g.drawLine(screenPos.x + size.width - 14, screenPos.y + 1, screenPos.x + size.width - 14, screenPos.y + size.height);
 				Polygon up = new Polygon();
-				up.addPoint(size.width - 12, 10);
-				up.addPoint(size.width - 2, 10);
-				up.addPoint(size.width - 7, 2);
-				canvas.draw(up);
+				up.addPoint(screenPos.x + size.width - 12, screenPos.y + 10);
+				up.addPoint(screenPos.x + size.width - 2, screenPos.y + 10);
+				up.addPoint(screenPos.x + size.width - 7, screenPos.y + 2);
+				g.draw(up);
 				Polygon down = new Polygon();
-				down.addPoint(size.width - 12, size.height - 10);
-				down.addPoint(size.width - 2, size.height - 10);
-				down.addPoint(size.width - 7, size.height - 2);
-				canvas.draw(down);
-				canvas.fill(up);
-				canvas.fill(down);
+				down.addPoint(screenPos.x + size.width - 12, screenPos.y + size.height - 10);
+				down.addPoint(screenPos.x + size.width - 2, screenPos.y + size.height - 10);
+				down.addPoint(screenPos.x + size.width - 7, screenPos.y + size.height - 2);
+				g.draw(down);
+				g.fill(up);
+				g.fill(down);
 			}
 		}
-		else // draw the selected item
+		else
 		{
 			if (numItems > 0)
 			{
-				canvas.setColor(TGUIManager.BLACK);
-				canvas.fillRect(1, 3, size.width - 15, fontHeight + 2);
-				canvas.setColor(newSelected != null ? newSelected : defSelected);
-				canvas.drawString(items.get(selected > -1 && selected < numItems ? selected : 0).text, 3, 0);
+				g.setColor(border);
+				g.fillRect(screenPos.x + 1, screenPos.y + 3, size.width - 15, fontHeight + 2);
+				g.setColor(selected_colour);
+				g.drawString(items.get(selected > -1 && selected < numItems ? selected : 0).item, screenPos.x + 3, screenPos.y);
 				if (selected < 0 || selected >= numItems)
 					selected = 0;
 			}
 			
-			canvas.setColor(TGUIManager.BLACK);
+			g.setColor(border);
 			Polygon down = new Polygon(); // draw the drop down button
-			down.addPoint(size.width - 12, 11);
-			down.addPoint(size.width - 2, 11);
-			down.addPoint(size.width - 7, 19);
-			canvas.draw(down);
-			canvas.fill(down);
+			down.addPoint(screenPos.x + size.width - 12, screenPos.y + 11);
+			down.addPoint(screenPos.x + size.width - 2, screenPos.y + 11);
+			down.addPoint(screenPos.x + size.width - 7, screenPos.y + 19);
+			g.draw(down);
+			g.fill(down);
 		}
 		if (TGUIManager.debug)
 		{
-			canvas.setColor(Color.yellow);
-			canvas.drawRect(0, 0, size.width - 1, size.height - 1);
+			g.setColor(TGUIManager.YELLOW);
+			g.drawRect(screenPos.x, screenPos.y, size.width, size.height);
 		}
-		canvas.flush();
-	}
-	
-	public void update(Graphics g)
-	{
-		if (mouseIsOver())
-		{
-			if (mouseOver != null)
-			{
-				mouseOver.execute(this);
-				changed = true;
-			}
-		}
-
-		try
-		{
-			if (changed)
-			{
-				updateLBD();
-				changed = false;
-			}
-		}
-		catch (SlickException e)
-		{
-			e.printStackTrace();
-		}
-
-		if (visible && alpha > 0.00F)
-			g.drawImage(graphic, screenPos.x, screenPos.y);
+		g.setColor(TGUIManager.BLACK);
 	}
 	
 	public void addItem(String text, T object)
 	{
-		items.add(new Item(text, object));
+		items.add(new TListBoxItem<T>(text, object));
 		numItems++;
 		if (resizeable)
 			resize();
@@ -168,7 +122,7 @@ public class TListBoxDropGen<T> extends TListBoxDrop
 	{
 		if (index < 0 || index >= numItems)
 			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
-		items.add(index, new Item(text, object));
+		items.add(index, new TListBoxItem<T>(text, object));
 		numItems++;
 		if (resizeable)
 			resize();
@@ -179,8 +133,8 @@ public class TListBoxDropGen<T> extends TListBoxDrop
 	{
 		if (index < 0 || index >= numItems)
 			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
-		Item item = items.get(index);
-		item.text = text;
+		TListBoxItem<T> item = items.get(index);
+		item.item = text;
 		item.object = object;
 		changed = true;
 	}
@@ -191,10 +145,10 @@ public class TListBoxDropGen<T> extends TListBoxDrop
 			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
 		items.remove(index);
 		numItems--;
-		if (!toobig)
+		if (!tooBig())
 			numDown = 0;
 		if (resizeable)
-			if (!toobig)
+			if (!tooBig())
 				resize();
 		changed = true;
 	}
@@ -202,15 +156,15 @@ public class TListBoxDropGen<T> extends TListBoxDrop
 	public List<String> getItemStrings()
 	{
 		List<String> list = new LinkedList<String>();
-		for (Item itr : items)
-			list.add(itr.text);
+		for (TListBoxItem<T> itr : items)
+			list.add(itr.item);
 		return list;
 	}
 	
 	public List<T> getItemObjects()
 	{
 		List<T> list = new LinkedList<T>();
-		for (Item itr : items)
+		for (TListBoxItem<T> itr : items)
 			list.add(itr.object);
 		return list;
 	}
@@ -219,7 +173,7 @@ public class TListBoxDropGen<T> extends TListBoxDrop
 	{
 		if (index < 0 || index >= numItems)
 			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
-		return items.get(index).text;
+		return items.get(index).item;
 	}
 	
 	public T getObject(int index) throws TGUIException
@@ -228,34 +182,11 @@ public class TListBoxDropGen<T> extends TListBoxDrop
 			throw new TGUIException("index " + index + " out of bounds! [" + numItems + "]");
 		return items.get(index).object;
 	}
-	
-	public void clear()
-	{
-		items.clear();
-		numItems = 0;
-		numDown = 0;
-		toobig = false;
-		selected = -1;
-		if (resizeable)
-			size.height = defH;
-		changed = true;
-	}
-	
-	private class Item implements Comparable<Item>
-	{
-		public String text;
-		public T object;
-		
-		public Item(String text, T object)
-		{
-			this.text = text;
-			this.object = object;
-		}
 
-		public int compareTo(Item o)
-		{
-			int comp = text.compareTo(o.text);
-			return comp == 0 ? -1 : comp;
-		}
+	public void sort(TESortDirection direction)
+	{
+		java.util.Collections.sort(items);
+		if (direction == TESortDirection.SORT_HIGHEST)
+			java.util.Collections.reverse(items);
 	}
 }

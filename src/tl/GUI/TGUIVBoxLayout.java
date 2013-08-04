@@ -26,25 +26,28 @@ public class TGUIVBoxLayout extends TGUILayout
 	
 	public void pOrganise()
 	{
-		System.out.println("vertical org:");
+		if (TGUIManager.debug)
+			System.out.println("vertical org:");
 		TSize parentSize = getParentSize();
 		int largestWidth = 0;
 		
-		int total = childSizes(parentSize, TEDirection.TopToBottom);
-		System.out.println("total " + total);
+		int total = childSizes(parentSize, TEDirection.TOP_TO_BOTTOM);
+		if (TGUIManager.debug)
+			System.out.println("total " + total);
 		float itr = position.y + space;
 		for (TGUIObject component : components)
 		{
 			if (stretch)
-				component.setSize(parentSize.width - space * 2, total);
+				component.setSize(parentSize.width - (int)position.x - space * 2, total);
 			component.setPosition(!stretch ? component.getPosition().x : position.x + space, itr);
-			System.out.println("pos: " + component.getPosition().toFormattedString() + " size: " + component.getSize().toFormattedString());
+			if (TGUIManager.debug)
+				System.out.println("pos: " + component.getPosition().toFormattedString() + " size: " + component.getSize().toFormattedString());
 			itr += component.getSize().height + space;
 			int width = component.getSize().width;
 			if (largestWidth < width)
 				largestWidth = width;
 		}
-		size.set(stretch ? parentSize.width : largestWidth, (int)(itr - position.y));
+		size.set(stretch ? parentSize.width - (int)position.x : largestWidth, (int)(itr - position.y));
 	}
 	
 	public void setPosition(float x, float y)
@@ -71,7 +74,8 @@ public class TGUIVBoxLayout extends TGUILayout
 	{
 		TSize size = new TSize(width, height);
 		float percentage = this.size.height / height;
-		System.out.println("perc: " + percentage);
+		if (TGUIManager.debug)
+			System.out.println("perc: " + percentage);
 		super.setSize(this.size.width, size.height);
 
 		float i = 0;
@@ -88,7 +92,8 @@ public class TGUIVBoxLayout extends TGUILayout
 	public void setSize(TSize size) // ignores width, meant to be used after organisation
 	{
 		float percentage = this.size.height / size.height;
-		System.out.println("perc: " + percentage);
+		if (TGUIManager.debug)
+			System.out.println("perc: " + percentage);
 		super.setSize(this.size.width, size.height);
 
 		float i = 0;

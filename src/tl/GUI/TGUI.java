@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.newdawn.slick.*;
 
-public class TGUI implements TGUIInterface
+public class TGUI implements TIGUIInterface
 {
 	public List<TGUIComponent> controls;
 	

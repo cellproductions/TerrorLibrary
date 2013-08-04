@@ -8,7 +8,6 @@ package tl.GUI;
 
 import java.util.ArrayList;
 
-import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
@@ -61,7 +60,7 @@ public class TLabelExtended extends TLabel
 			graphic = new Image(height, list.size() * 24);
 		
 		height = list.size();
-		
+		/*
 		canvas = graphic.getGraphics();
 		canvas.clear();
 		canvas.setFont(TGUIManager.guiFont);
@@ -69,7 +68,7 @@ public class TLabelExtended extends TLabel
 		int size = list.size();
 		for (int i = 0; i < size; i++)
 			canvas.drawString(list.get(i), 0, i * 24);
-		canvas.flush();
+		canvas.flush();*/
 	}
 	
 	public void update(Graphics g)

@@ -18,17 +18,17 @@ import tl.Util.TSize;
  * @author Callum Nichols
  * @since 2.0
  */
-public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparable<TGUIComponent>
+public class TGUIComponent extends TGUIObject implements TIGUIInterface, Comparable<TGUIComponent>
 {
 	protected Image graphic;
-	protected Graphics canvas; // canvas used to draw the default textures onto the graphic
+	//protected Graphics canvas; // canvas used to draw the default textures onto the graphic
 	protected TGUIComponent parent;
 	protected ArrayList<TGUIComponent> children;
 	protected int compcounter;
 	protected int priority = 0; // controls are drawn from lowest priority to highest [OBSOLETE?]
 	protected boolean changed = false;
-	public final Color background = TGUIManager.GUI_MAIN;
-	public final Color border = TGUIManager.GUI_BORDER;
+	public final Color background = new Color(TGUIManager.GUI_MAIN);
+	public final Color border = new Color(TGUIManager.GUI_BORDER);
 	protected float alpha = 1f; // only for the constructor
 	
 	/* PROPERTIES_START */
@@ -126,7 +126,7 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 		if (parent == null)
 			ID = TGUIManager.numGUIs++;
 		else
-			setParent(parent);
+			parent.addComponent(this);
 		enabled = parent != null ? parent.enabled : true;
 		visible = parent != null ? parent.visible : true;
 	}
@@ -138,22 +138,20 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 		screenPos = new TPoint(parent != null ? parent.getX() : 0, parent != null ? parent.getY() : 0);
 		screenPos = screenPos.add(position);
 		size = new TSize(width, height);
-		visible = true;
 		changed = true;
 	}
 	
 	public TGUIComponent(TGUIComponent parent, float x, float y, boolean visible, int width, int height, float t)
 	{
-		type = ComponentType.component;
-		graphic = TGUIManager.emptyImage;
+		this();
 		if (parent == null)
 			ID = TGUIManager.numGUIs++;
 		else
-			setParent(parent);
-		position = new TPoint(x, y);
-		screenPos = new TPoint(parent != null ? parent.getX() : 0, parent != null ? parent.getY() : 0);
+			parent.addComponent(this);
+		position.set(x, y);
+		screenPos.set(parent != null ? parent.getX() : 0, parent != null ? parent.getY() : 0);
 		screenPos = screenPos.add(position);
-		size = new TSize(width, height);
+		size.set(width, height);
 		enabled = parent != null ? parent.enabled : true;
 		this.visible = visible;
 		changed = true;
@@ -170,8 +168,15 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 		return type;
 	}
 	
-	private void updateC() throws SlickException
+	protected void change()
 	{
+		background.a = alpha;
+		border.a = alpha;
+		changed = false;
+	}
+	
+	protected void draw(Graphics g) throws SlickException
+	{/*
 		if (graphic == TGUIManager.emptyImage)
 		{
 			graphic = new Image(size.width, size.height);
@@ -182,7 +187,12 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 		canvas.fillRect(0, 0, size.width - 1, size.height - 1);
 		canvas.setColor(border);
 		canvas.drawRect(0, 0, size.width - 1, size.height - 1);
-		canvas.flush();
+		canvas.flush();*/
+		g.setColor(background);
+		g.fillRect(screenPos.x + 1, screenPos.y + 1, size.width - 1, size.height - 1);
+		g.setColor(border);
+		g.drawRect(screenPos.x, screenPos.y, size.width, size.height);
+		g.setColor(TGUIManager.BLACK);
 	}
 
 	public void update(Graphics g)
@@ -196,21 +206,18 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 			}
 		}
 		
+		if (changed)
+			change();
+		
 		try
 		{
-			if (changed)
-			{
-				updateC();
-				changed = false;
-			}
+			if (visible && alpha > 0.00f)
+				draw(g);
 		}
 		catch (SlickException e)
 		{
 			e.printStackTrace();
 		}
-		
-		if (visible && alpha > 0.00f)
-			g.drawImage(graphic, screenPos.x, screenPos.y);
 		drawAll(g);
 	}
 	
@@ -268,6 +275,11 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 	{
 		return screenPos.y;
 	}
+	
+	public TPoint getScreenPosition()
+	{
+		return new TPoint(screenPos.x, screenPos.y);
+	}
 
 	public void setPosition(float x, float y)
 	{
@@ -299,9 +311,9 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 		return size.height;
 	}
 
-	public void setSize(int width, int heigth)
+	public void setSize(int width, int height)
 	{
-		size.set(width, heigth);
+		size.set(width, height);
 		graphic = TGUIManager.emptyImage;
 		changed = true;
 	}
@@ -344,6 +356,7 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 		alpha = transparency;
 		if (graphic != null)
 			graphic.setAlpha(transparency);
+		changed = true;
 		if (children != null)
 			for (TGUIComponent child : children)
 				child.setTransparency(transparency);
@@ -395,7 +408,7 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 			//throw new TGUIException(type.toString() + "[" + ID + "]: child's[" + child.ID + "] parent[" + (parent == null ? "null" : parent.ID) + "] has not been set as this component!");
 		if (children == null)
 			children = new ArrayList<TGUIComponent>();
-		else if (!children.contains(child))
+		if (!children.contains(child))
 		{
 			if (child.parent != null && child.parent != this)
 				child.parent.children.remove(child);
@@ -412,7 +425,9 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 	{
 		if (children == null)
 			throw new TGUIException(type.toString() + "[" + ID + "]: component has no children!");
-		if (child != null)
+		if (child == null)
+			throw new TGUIException(type.toString() + "[" + ID + "]: child component is NULL!");
+		else
 			child.parent = null;
 		children.remove(child);
 		child.setPosition(child.getX(), child.getY());
@@ -464,10 +479,18 @@ public class TGUIComponent extends TGUIObject implements TGUIInterface, Comparab
 			return;
 		}
 		if (this.parent != null)
-			this.parent.children.remove(this);
-		this.parent = parent;
+			if (this.parent.children.contains(this))
+				this.parent.children.remove(this);
 		parent.addComponent(this);
-		setProperties(parent);
+	}
+	
+	public void setColour(Color toChange, Color newColor)
+	{
+		toChange.a = newColor.a;
+		toChange.r = newColor.r;
+		toChange.g = newColor.g;
+		toChange.b = newColor.b;
+		changed = true;
 	}
 	
 	public void onMouseOver(TGUIMouseOverEvent function)

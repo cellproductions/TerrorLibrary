@@ -26,25 +26,28 @@ public class TGUIHBoxLayout extends TGUILayout
 	
 	public void pOrganise()
 	{
-		System.out.println("horizontal org:");
+		if (TGUIManager.debug)
+			System.out.println("horizontal org:");
 		TSize parentSize = getParentSize();
 		int largestHeight = 0;
 		
-		int total = childSizes(parentSize, TEDirection.LeftToRight);
-		System.out.println("total " + total);
+		int total = childSizes(parentSize, TEDirection.LEFT_TO_RIGHT);
+		if (TGUIManager.debug)
+			System.out.println("total " + total);
 		float itr = position.x + space;
 		for (TGUIObject component : components)
 		{
 			if (stretch)
-				component.setSize(total, parentSize.height - space * 2);
+				component.setSize(total, parentSize.height - (int)position.y - space * 2);
 			component.setPosition(itr, !stretch ? component.getPosition().y : position.y + space);
-			System.out.println("pos: " + component.getPosition().toFormattedString() + " size: " + component.getSize().toFormattedString());
+			if (TGUIManager.debug)
+				System.out.println("pos: " + component.getPosition().toFormattedString() + " size: " + component.getSize().toFormattedString());
 			itr += component.getSize().width + space;
 			int height = component.getSize().height;
 			if (largestHeight < height)
 				largestHeight = height;
 		}
-		size.set((int)(itr - position.x), stretch ? parentSize.height : largestHeight);
+		size.set((int)(itr - position.x), stretch ? parentSize.height - (int)position.y : largestHeight);
 	}
 	
 	public void setPosition(float x, float y)
