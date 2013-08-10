@@ -11,6 +11,12 @@ public class TBound
 		bCorner = new TPoint();
 	}
 	
+	public TBound(TBound bound)
+	{
+		tCorner = new TPoint(bound.tCorner);
+		bCorner = new TPoint(bound.bCorner);
+	}
+	
 	public TBound(TPoint top, TPoint bottom)
 	{
 		tCorner = new TPoint(top);
@@ -35,6 +41,12 @@ public class TBound
 		bCorner = new TPoint(x + width, y + height);
 	}
 	
+	public void set(TBound bound)
+	{
+		tCorner.set(bound.tCorner);
+		bCorner.set(bound.bCorner);
+	}
+	
 	public void set(TPoint top, TPoint bottom)
 	{
 		tCorner.set(top);
@@ -45,6 +57,18 @@ public class TBound
 	{
 		tCorner.set(tx, ty);
 		bCorner.set(bx, by);
+	}
+	
+	public void set(TPoint topLeft, TSize dimensions)
+	{
+		tCorner.set(topLeft);
+		bCorner.set(topLeft.x + dimensions.width, topLeft.y + dimensions.height);
+	}
+	
+	public void set(float tx, float ty, int width, int height)
+	{
+		tCorner.set(tx, ty);
+		bCorner.set(tx + width, ty + height);
 	}
 	
 	public void setTopCorner(TPoint top)

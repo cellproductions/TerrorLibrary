@@ -40,4 +40,9 @@ public enum TTriBool
 		else
 			return UNDEFINED;
 	}
+	
+	public String toString()
+	{
+		return "" + value;
+	}
 }

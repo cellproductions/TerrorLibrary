@@ -68,6 +68,7 @@ GUIComponents:
 * adding a component should set its parent to the component doing the adding
 * instead of checking if graphic == null, create a nullImage image and initialise all graphics with that (0x0 image with nothing in it)
 * remove all excess changed = true; statements (most arent needed anymore)
+* replace checks for mouseIsOver with TBounds
 
 
 GUI:
@@ -101,6 +102,7 @@ GUILayout:
 	* also add a TPalettes enum that holds a bunch of pre-made themes and can swap out palettes
 * complete TSize comparison methods
 * add TGUIVisibilityEvent, gets called every time a component's visibility is toggled
+* add 'final' keywords to all unoverridable methods
 
 BUGS:
 * clicking on an Item in a ListBox gets gradually more offset for some reason (same in other collection implemented subclasses)

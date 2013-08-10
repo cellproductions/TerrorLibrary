@@ -4,6 +4,7 @@ public class TSize implements Comparable<TSize>
 {
 	public int width;
 	public int height;
+	public static final TSize ZERO = new TSize();
 	
 	public TSize()
 	{

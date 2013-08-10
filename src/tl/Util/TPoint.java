@@ -4,6 +4,7 @@ public class TPoint implements Comparable<TPoint>
 {
 	public float x;
 	public float y;
+	public static final TPoint ZERO = new TPoint();
 	
 	public TPoint()
 	{
@@ -114,6 +115,15 @@ public class TPoint implements Comparable<TPoint>
 		return x + "," + y;
 	}
 	
+	public void rotate(float angle)
+	{
+		double rad = Math.toRadians(angle);
+		float xx = x;
+		float yy = y;
+		x = (float)(xx * FastTrig.cos(rad) - yy * FastTrig.sin(rad));
+		y = (float)(xx * FastTrig.sin(rad) + yy * FastTrig.cos(rad));
+	}
+	
 	/**
 	 * Used for converting an x index and a y index into a single index for use in a 1D array.<br>
 	 * E.g.<br>
@@ -175,7 +185,7 @@ public class TPoint implements Comparable<TPoint>
 	}
 	
 	/**
-	 * Used by {@link #distance(TPoint, TPoint)} and {@link #normalize(TPoint)} to find the length for a single point. 
+	 * Used by {@link #distance(TPoint, TPoint)}, {@link #normalize(TPoint)}, and {@link #normalizeDestination(TPoint, TPoint)} to find the length for a single point. 
 	 * @param point - The point to find the length of
 	 * @return - A double representing the length
 	 */
@@ -190,10 +200,20 @@ public class TPoint implements Comparable<TPoint>
 	 * @param destination - The point to arrive at
 	 * @return - The direction as a TPoint
 	 */
-	public static TPoint normalize(TPoint source, TPoint destination)
+	public static TPoint normalizeDestination(TPoint source, TPoint destination)
 	{
 		TPoint point = destination.subtract(source);
 		return new TPoint(point.x / (float)length(point), point.y / (float)length(point));
+	}
+	
+	/**
+	 * Creates and returns a direction from a source point.
+	 * @param source - The point to start from
+	 * @return - The direction as a TPoint
+	 */
+	public static TPoint normalize(TPoint source)
+	{
+		return new TPoint(source.x / (float)length(source), source.y / (float)length(source));
 	}
 	
 	/**
@@ -219,4 +239,36 @@ public class TPoint implements Comparable<TPoint>
 	{
 		return Math.atan2(destination.y - source.y, destination.x - source.x);
 	}
+	
+	/**
+	 * Applies a rotation transformation to a given TPoint.
+	 * @param angle - The angle in degrees to rotate by
+	 * @param source - The point to rotate
+	 * @return - A new TPoint representing the transformation
+	 */
+	public static TPoint transformRotate(float angle, TPoint source)
+	{
+		return new TPoint((float)(source.x * FastTrig.cos(angle) - source.y * FastTrig.sin(angle)), (float)(source.x * FastTrig.sin(angle) + source.y * FastTrig.cos(angle)));
+	}
+	
+	/**
+	 * Applies a rotation transformation to a given position.
+	 * @param angle - The angle in degrees to rotate by
+	 * @param sourceX - The x position to rotate
+	 * @param sourceY - The y position to rotate
+	 * @return - A new TPoint representing the transformation
+	 */
+	public static TPoint transformRotate(float angle, float sourceX, float sourceY)
+	{
+		return new TPoint((float)(sourceX * FastTrig.cos(angle) - sourceY * FastTrig.sin(angle)), (float)(sourceX * FastTrig.sin(angle) + sourceY * FastTrig.cos(angle)));
+	}
+	/*
+	public static TPoint transformRotate(float angle, TPoint source, TPoint around)
+	{
+		float sinangle = (float)FastTrig.sin(angle);
+		float cosangle = 1f - (float)FastTrig.cos(angle);
+		float aroundX = around.x * cosangle + around.y * sinangle;
+		float aroundY = around.y * cosangle - around.x * sinangle;
+		
+	}*/
 }

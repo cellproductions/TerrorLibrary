@@ -16,7 +16,7 @@ import tl.Util.TSize;
  * The TGUIComponent can be inherited to create almost any other user defined TGUI.
  * 
  * @author Callum Nichols
- * @since 2.0
+ * @version 2.0
  */
 public class TGUIComponent extends TGUIObject implements TIGUIInterface, Comparable<TGUIComponent>
 {

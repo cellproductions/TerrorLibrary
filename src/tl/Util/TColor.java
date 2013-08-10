@@ -1,5 +1,7 @@
 package tl.Util;
 
+import java.util.Random;
+
 import org.newdawn.slick.Color;
 
 public class TColor
@@ -34,5 +36,18 @@ public class TColor
 	public static Color RGBtoSL(Color colour)
 	{
 		return new Color(colour.r / MAX, colour.g / MAX, colour.b / MAX, colour.a / MAX);
+	}
+	
+	public static Color randomColor(boolean alpha)
+	{
+		Random rand = new Random();
+		return new Color((float)rand.nextInt(101) / 100f, (float)rand.nextInt(101) / 100f, (float)rand.nextInt(101) / 100f, alpha ? ((float)rand.nextInt(101) / 100f) : 1f);
+	}
+	
+	public static Color randomShade(boolean alpha)
+	{
+		Random rand = new Random();
+		float shade = rand.nextInt(101) / 100f;
+		return new Color(shade, shade, shade, alpha ? ((float)rand.nextInt(101) / 100f) : 1f);
 	}
 }
