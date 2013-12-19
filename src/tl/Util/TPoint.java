@@ -115,6 +115,18 @@ public class TPoint implements Comparable<TPoint>
 		return x + "," + y;
 	}
 	
+	public void translate(float xPos, float yPos)
+	{
+		x += xPos;
+		y += yPos;
+	}
+	
+	public void scale(float xScale, float yScale)
+	{
+		x *= xScale;
+		y *= yScale;
+	}
+	
 	public void rotate(float angle)
 	{
 		double rad = Math.toRadians(angle);
@@ -140,7 +152,7 @@ public class TPoint implements Comparable<TPoint>
 	 * @param width - Width of a row in the 2D array
 	 * @param px - Index x
 	 * @return - The 1D index
-	 * @see #get2DIndex(int, int)
+	 * @see #get2DIndex(int, int, TPoint)
 	 */
 	public static int get1DIndex(int py, int width, int px)
 	{
@@ -165,11 +177,14 @@ public class TPoint implements Comparable<TPoint>
 	 * </pre>
 	 * @param index - The 1D index
 	 * @param width - The width of a row in the 2D array
-	 * @return - The new 2D index
+	 * @param point - The point to store the result in
+	 * @return - The newly edited point
 	 */
-	public static TPoint get2DIndex(int index, int width)
+	public static TPoint get2DIndex(int index, int width, TPoint point)
 	{
-		return new TPoint(index % width, index / width);
+		int y = index / width;
+		point.set(index - y * width, y);
+		return point;
 	}
 	
 	/**
@@ -271,4 +286,82 @@ public class TPoint implements Comparable<TPoint>
 		float aroundY = around.y * cosangle - around.x * sinangle;
 		
 	}*/
+	
+	public boolean equals(TPoint point)
+	{
+		return x == point.x && y == point.y;
+	}
+	
+	public int hashCode()
+	{
+		return (int)(13f * x + 43f * y);
+	}
+	
+	/**
+	 * Direction provides a quick and easy abstraction for directions based on a 2D point.
+	 * @author Callum Nichols
+	 * @version 2.2
+	 */
+	public static enum Direction
+	{
+		NONE(0, 0), NORTH(0, -1), SOUTH(0, 1), EAST(1, 0), WEST(-1, 0),
+		NORTH_EAST(1, -1), NORTH_WEST(-1, -1), SOUTH_EAST(1, 1), SOUTH_WEST(-1, 1);
+		
+		private TPoint dir;
+		
+		private Direction(float x, float y)
+		{
+			dir = new TPoint(x, y);
+		}
+		
+		/**
+		 * Returns the 2D point representation of this direction.
+		 * @return - A TPoint storing the direction
+		 */
+		public TPoint toTPoint()
+		{
+			return dir;
+		}
+		
+		/**
+		 * Converts a TPoint to a direction. If the point does not match any of the directions, then it returns Direction.NONE.
+		 * @param point - The TPoint to convert
+		 * @return - A Direction representing the TPoint
+		 * @see #valueOf(float, float)
+		 */
+		public static Direction valueOf(TPoint point)
+		{
+			return valueOf(point.x, point.y);
+		}
+		
+		/**
+		 * Converts a 2D point into a direction. If the point does not match any of the directions, then it returns Direction.NONE.
+		 * @param x - The x position of the point
+		 * @param y - The y position of the point
+		 * @return - A Direction representing the 2D point
+		 * @see #valueOf(TPoint)
+		 */
+		public static Direction valueOf(float x, float y)
+		{
+			if (x == 0 && y == 0)
+				return NONE;
+			else if (x == 0 && y == -1)
+				return NORTH;
+			else if (x == 0 && y == 1)
+				return SOUTH;
+			else if (x == 1 && y == 0)
+				return EAST;
+			else if (x == -1 && y == 0)
+				return WEST;
+			else if (x == 1 && y == -1)
+				return NORTH_EAST;
+			else if (x == -1 && y == -1)
+				return NORTH_WEST;
+			else if (x == 1 && y == 1)
+				return SOUTH_EAST;
+			else if (x == -1 && y == 1)
+				return SOUTH_WEST;
+			return NONE;
+		}
+	}
 }

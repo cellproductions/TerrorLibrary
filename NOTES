@@ -103,6 +103,9 @@ GUILayout:
 * complete TSize comparison methods
 * add TGUIVisibilityEvent, gets called every time a component's visibility is toggled
 * add 'final' keywords to all unoverridable methods
+* create a Vector2<T> class that contains a bunch of methods (add, sub, etc)
+	* make TPoint implement it (TPoint<Float>), finish all methods
+* create a muttable String type (can be edited directly)
 
 BUGS:
 * clicking on an Item in a ListBox gets gradually more offset for some reason (same in other collection implemented subclasses)

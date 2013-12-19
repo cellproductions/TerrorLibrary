@@ -100,12 +100,12 @@ public class TConfigLoader
 				value = value.substring(0, value.indexOf('#')).trim();
 		}
 		
-		public String getOption()
+		final public String getOption()
 		{
 			return option;
 		}
 		
-		public String getValue()
+		final public String getValue()
 		{
 			return value;
 		}
@@ -115,7 +115,7 @@ public class TConfigLoader
 		 * @param trim - Whether or not the value should be trimmed before being returned
 		 * @return - The option's value
 		 */
-		public String getValue(boolean trim)
+		final public String getValue(boolean trim)
 		{
 			if (trim)
 				return value.trim();

@@ -61,6 +61,35 @@ public class TConfig implements Iterable<Setting>
 	}
 	
 	/**
+	 * Returns an option's value as an integer. If the option isn't found, a TException is thrown.
+	 * @param option - The name of the option as it appears in its respective configuration file
+	 * @return - The option's value, or throws an exception
+	 * @throws TException
+	 */
+	public int getInt(String option) throws TException
+	{
+		for (Setting setting : list)
+			if (setting.option.contentEquals(option))
+				return Integer.parseInt(setting.value);
+		throw new TException("Option " + option + " not found!");
+	}
+	
+	/**
+	 * Returns an option's value as an integer. If the option isn't found, a TException is thrown.
+	 * @param option - The name of the option as it appears in its respective configuration file
+	 * @param radix - The radix of the integer stored
+	 * @return - The option's value, or throws an exception
+	 * @throws TException
+	 */
+	public int getInt(String option, int radix) throws TException
+	{
+		for (Setting setting : list)
+			if (setting.option.contentEquals(option))
+				return Integer.parseInt(setting.value, radix);
+		throw new TException("Option " + option + " not found!");
+	}
+	
+	/**
 	 * Sets an option's value to anything that overrides the toString() method.<br>
 	 * If the option isn't found, a TException is thrown.
 	 * @param option - The option that's value needs changing

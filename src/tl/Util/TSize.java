@@ -1,6 +1,6 @@
 package tl.Util;
 
-public class TSize implements Comparable<TSize>
+public class TSize implements Comparable<TSize>, TITransformable<Integer>
 {
 	public int width;
 	public int height;
@@ -85,5 +85,45 @@ public class TSize implements Comparable<TSize>
 	public String toFormattedString()
 	{
 		return width + ", " + height;
+	}
+
+	@Override
+	public void translate(Integer distance)
+	{
+		width += distance;
+		height += distance;
+	}
+
+	@Override
+	public void translate(Integer xdistance, Integer ydistance)
+	{
+		width += xdistance;
+		height += ydistance;
+	}
+
+	@Override
+	public void scale(Integer amount)
+	{
+		width *= amount;
+		height *= amount;
+	}
+
+	@Override
+	public void scale(Integer xscale, Integer yscale)
+	{
+		width *= xscale;
+		height *= yscale;
+	}
+
+	@Override
+	public void rotate(double angle)
+	{
+		 // TODO dont forget this shit
+	}
+
+	@Override
+	public void rotate(double angle, Integer x, Integer y)
+	{
+		// TODO dont forget this shit
 	}
 }

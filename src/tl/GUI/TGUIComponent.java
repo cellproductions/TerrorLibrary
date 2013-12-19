@@ -24,7 +24,7 @@ public class TGUIComponent extends TGUIObject implements TIGUIInterface, Compara
 	//protected Graphics canvas; // canvas used to draw the default textures onto the graphic
 	protected TGUIComponent parent;
 	protected ArrayList<TGUIComponent> children;
-	protected int compcounter;
+	protected int compcounter; // OBSOLETE?
 	protected int priority = 0; // controls are drawn from lowest priority to highest [OBSOLETE?]
 	protected boolean changed = false;
 	public final Color background = new Color(TGUIManager.GUI_MAIN);
@@ -218,10 +218,10 @@ public class TGUIComponent extends TGUIObject implements TIGUIInterface, Compara
 		{
 			e.printStackTrace();
 		}
-		drawAll(g);
+		updateAll(g);
 	}
 	
-	protected void drawAll(Graphics g)
+	protected void updateAll(Graphics g)
 	{
 		if (children != null)
 			for (TGUIComponent child : children)
@@ -383,12 +383,12 @@ public class TGUIComponent extends TGUIObject implements TIGUIInterface, Compara
 	protected void setProperties(TGUIComponent parent)
 	{
 		boolean notnull = parent != null;
-		screenPos.set(parent != null ? parent.getX() : 0, parent != null ? parent.getY() : 0);
+		screenPos.set(notnull ? parent.getX() : 0, notnull ? parent.getY() : 0);
 		screenPos = screenPos.add(position);
 		visible = (notnull ? parent.visible : true);
 		enabled = (notnull ? parent.enabled : true);
 		if (graphic != null)
-			graphic.setAlpha(notnull ? (parent.graphic  != null ? parent.graphic.getAlpha() : 1f) : 1f);
+			graphic.setAlpha(notnull ? (parent.graphic != null ? parent.graphic.getAlpha() : 1f) : 1f);
 	}
 	
 	public synchronized TGUIComponent child(int index) throws TGUIException
@@ -469,7 +469,7 @@ public class TGUIComponent extends TGUIObject implements TIGUIInterface, Compara
 		return parent;
 	}
 	
-	public void setParent(TGUIComponent parent) throws TGUIException
+	public void setParent(TGUIComponent parent) throws TGUIException // TODO FULL OF BUGS 
 	{
 		if (parent == null)
 		{
@@ -525,7 +525,7 @@ public class TGUIComponent extends TGUIObject implements TIGUIInterface, Compara
 
 	public void mouseReleased(int button, int x, int y)
 	{
-		if (enabled)
+		if (enabled) // TODO dont forget to run mouseRelease here as well
 			if (children != null)
 				for (TGUIComponent child : children)
 					child.mouseReleased(button, x, y);
